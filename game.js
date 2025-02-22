@@ -136,7 +136,8 @@ class MainScene extends Phaser.Scene {
         this.chats={
             'Skibidi skibidi toilet!':'',
             'What is your problem?':{
-                "Give Shit":"HUUUURGGEHH"
+                "Give Shit":"HUUUURGGEHH",
+                "Nothing":"..."
             },
             "What the sigma?":""
         }
