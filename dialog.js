@@ -25,6 +25,7 @@ export class Dialog{
 
         if (choices!=""){
             let i=0;
+            //choice: option text; value: respond text
             for (let [choice, value] of Object.entries(choices)){
                 this.option = game.add.text(60, game.gameHeight - (90-35*i), `Option ${i+1}: ${choice}`, {
                     font: '20px Arial',
@@ -34,9 +35,19 @@ export class Dialog{
                 this.optionBoxes.push(this.option);
 
                 this.option.on('pointerdown', () => {
-                    this.game.inventory.push(choice);
                     this.destroyDialog();
-                    this.updateDialog(value,'')
+                    if (choice=="Give Shit"){
+                        if (this.game.inventory.includes("Shit")){
+                            this.updateDialog(value,'');
+                            this.game.inventory = this.game.inventory.filter(item => item !== 'Shit'); //delete all Shit
+                        }else{
+                            this.updateDialog("You don't have shit to give.",'');
+                        }
+                    }else{
+                        this.game.inventory.push(choice);
+                        this.updateDialog(value,'')
+                    }
+
                 });
 
                 i++;

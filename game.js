@@ -135,7 +135,10 @@ class MainScene extends Phaser.Scene {
         console.log('Talking to the toilet...');
         this.chats={
             'Skibidi skibidi toilet!':'',
-            'What is your problem?':''
+            'What is your problem?':{
+                "Give Shit":"HUUUURGGEHH"
+            },
+            "What the sigma?":""
         }
         this.dialog1 = new Dialog(this,this.chats);
         this.dialog1.showDialogs();
