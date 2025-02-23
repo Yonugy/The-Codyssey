@@ -40,6 +40,8 @@ export class Dialog{
                         if (this.game.inventory.includes("Shit")){
                             this.updateDialog(value,'');
                             this.game.inventory = this.game.inventory.filter(item => item !== 'Shit'); //delete all Shit
+                            this.game.quest["Give toilet shit"]=1;
+                            this.game.npcStatus['bin']=2;
                         }else{
                             this.updateDialog("You don't have shit to give.",'');
                         }

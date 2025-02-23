@@ -6,6 +6,9 @@ class MainScene extends Phaser.Scene {
         this.collisionHappened = false
         this.touching="";
         this.inventory=[];
+        this.quest={
+            "Give toilet shit":0
+        }
     }
 
     init(data) {
@@ -20,6 +23,7 @@ class MainScene extends Phaser.Scene {
         this.load.image('bin', 'asset/trash_bin.png');
         this.load.image('apu', 'asset/apu_logo.png');
         this.load.image('toilet', 'asset/toilet.png');
+        this.load.image('cat', 'asset/cat.gif');
     }
 
     create() {
@@ -35,12 +39,15 @@ class MainScene extends Phaser.Scene {
         this.toilet = this.physics.add.sprite(500, 0, 'toilet');
         this.toilet.setScale(0.5);
 
-        this.npcList = [this.bin, this.apu, this.toilet];
+        this.cat = this.physics.add.sprite(600, 300, 'cat');
+        this.cat.setScale(0.5);
+
+        this.npcList = [this.bin, this.apu, this.toilet, this.cat];
 
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'ben');
         this.player.setScale(0.2);
 
-        this.npcStatus={'bin':0};
+        this.npcStatus={'bin':0, "apu":0, "toilet":0};
 
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
             fontSize: '24px',
@@ -84,6 +91,10 @@ class MainScene extends Phaser.Scene {
             this.talkButton.setVisible(false);
         }
 
+        // if (this.quest["Give toilet shit"]==1){
+        //     this.npcStatus['bin']=2;
+        // }
+
 
     }
 
@@ -116,33 +127,55 @@ class MainScene extends Phaser.Scene {
             }
             this.dialog1 = new Dialog(this,this.chats);
             this.dialog1.showDialogs();
+
+        }else if (this.npcStatus['bin']==2){
+            this.chats={
+                'Good job in getting the shit in the skibidi toilet!':'',
+                'Next, go get the trash in the oiia!':''
+            }
+            this.dialog1 = new Dialog(this,this.chats);
+            this.dialog1.showDialogs();
+            this.npcStatus['bin']=3;
+
+        }else if (this.npcStatus['bin']==3){
+            this.chats={
+                'Go get the trash in the oiia!':''
+            }
+            this.dialog1 = new Dialog(this,this.chats);
+            this.dialog1.showDialogs();
         }
     }
 
     talkToApu(){
         console.log('Talking to the apu...');
-        this.chats={
-            'What do you want?':{
-                'Trash':'Here you go! Trash taking trash!',
-                "Shit":"Here you go! Shit taking shit!"
+        if (this.npcStatus['apu']==0){
+                this.chats={
+                'What do you want?':{
+                    'Trash':'Here you go! Trash taking trash!',
+                    "Shit":"Here you go! Shit taking shit!"
+                }
             }
+            this.dialog1 = new Dialog(this,this.chats);
+            this.dialog1.showDialogs();
         }
-        this.dialog1 = new Dialog(this,this.chats);
-        this.dialog1.showDialogs();
+        
     }
 
     talkToToilet(){
         console.log('Talking to the toilet...');
-        this.chats={
-            'Skibidi skibidi toilet!':'',
-            'What is your problem?':{
-                "Give Shit":"HUUUURGGEHH",
-                "Nothing":"..."
-            },
-            "What the sigma?":""
+        if (this.npcStatus['toilet']==0){
+            this.chats={
+                'Skibidi skibidi toilet!':'',
+                'What is your problem?':{
+                    "Give Shit":"HUUUURGGEHH",
+                    "Nothing":"..."
+                },
+                "What the sigma?":""
+            }
+            this.dialog1 = new Dialog(this,this.chats);
+            this.dialog1.showDialogs();
         }
-        this.dialog1 = new Dialog(this,this.chats);
-        this.dialog1.showDialogs();
+        
     }
 
     talk() {
@@ -168,6 +201,9 @@ class MainScene extends Phaser.Scene {
             }else if (object === this.toilet) {
                 this.talkButton.setText('Talk to Toilet');
                 this.touching='toilet';
+            }else if (object === this.cat) {
+                this.talkButton.setText('Talk to Cat');
+                this.touching='cat';
             }
             this.talkButton.setVisible(true);
         }
