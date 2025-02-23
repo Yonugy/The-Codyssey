@@ -17,7 +17,7 @@ class MainScene extends Phaser.Scene {
         this.gameHeight = data.height;
     }
 
-    preload() {
+    preload() { //update on new npc
         this.load.image('bg', 'asset/walpaper.jpg');
         this.load.image('ben', 'asset/ben.jpg');
         this.load.image('bin', 'asset/trash_bin.png');
@@ -26,7 +26,7 @@ class MainScene extends Phaser.Scene {
         this.load.image('cat', 'asset/cat.gif');
     }
 
-    create() {
+    create() { //update on new npc
         this.bg = this.physics.add.image(0, 0, 'bg');
         this.bg.setScale(2);
 
@@ -42,12 +42,12 @@ class MainScene extends Phaser.Scene {
         this.cat = this.physics.add.sprite(600, 300, 'cat');
         this.cat.setScale(0.5);
 
-        this.npcList = [this.bin, this.apu, this.toilet, this.cat];
+        this.npcList = [this.bin, this.apu, this.toilet, this.cat]; //update on new npc
 
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'ben');
         this.player.setScale(0.2);
 
-        this.npcStatus={'bin':0, "apu":0, "toilet":0};
+        this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
 
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
             fontSize: '24px',
@@ -158,7 +158,6 @@ class MainScene extends Phaser.Scene {
             this.dialog1 = new Dialog(this,this.chats);
             this.dialog1.showDialogs();
         }
-        
     }
 
     talkToToilet(){
@@ -175,10 +174,20 @@ class MainScene extends Phaser.Scene {
             this.dialog1 = new Dialog(this,this.chats);
             this.dialog1.showDialogs();
         }
-        
     }
 
-    talk() {
+    talkToCat(){
+        console.log('Talking to the cat...');
+        if (this.npcStatus['cat']==0){
+            this.chats={
+                'Oiiai, oiiai':''
+            }
+            this.dialog1 = new Dialog(this,this.chats);
+            this.dialog1.showDialogs();
+        }
+    }
+
+    talk() { //update on new npc
         this.talkButton.setVisible(false);
         this.collisionHappened = true;
         if (this.touching=="bin"){
@@ -187,10 +196,12 @@ class MainScene extends Phaser.Scene {
             this.talkToApu();
         }else if (this.touching=="toilet"){
             this.talkToToilet();
+        }else if (this.touching=="cat"){
+            this.talkToCat();
         }
     }
 
-    showTalk(player, object) {
+    showTalk(player, object) { //update on new npc
         if (!this.collisionHappened) {
             if (object === this.bin) {
                 this.talkButton.setText('Talk to Bin');
