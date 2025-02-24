@@ -7,7 +7,8 @@ class MainScene extends Phaser.Scene {
         this.touching="";
         this.inventory=[];
         this.quest={
-            "Give toilet shit":0
+            "Give toilet shit":0,
+            "Give cat trash":0
         }
     }
 
@@ -143,6 +144,13 @@ class MainScene extends Phaser.Scene {
             }
             this.dialog1 = new Dialog(this,this.chats);
             this.dialog1.showDialogs();
+
+        }else if (this.npcStatus['bin']==4){
+            this.chats={
+                'Good job':''
+            }
+            this.dialog1 = new Dialog(this,this.chats);
+            this.dialog1.showDialogs();
         }
     }
 
@@ -167,7 +175,7 @@ class MainScene extends Phaser.Scene {
                 'Skibidi skibidi toilet!':'',
                 'What is your problem?':{
                     "Give Shit":"HUUUURGGEHH",
-                    "Nothing":"..."
+                    "Bye":"..."
                 },
                 "What the sigma?":""
             }
@@ -180,7 +188,11 @@ class MainScene extends Phaser.Scene {
         console.log('Talking to the cat...');
         if (this.npcStatus['cat']==0){
             this.chats={
-                'Oiiai, oiiai':''
+                'Oiiai, oiiai':'',
+                'Oiiai, oiiai?':{
+                    "Give Trash":"EEEEEEAAAAAAAAAAAAAAARRRRRRRRRRRRRREIR",
+                    "Bye":"Oiiai, oiiai"
+                }
             }
             this.dialog1 = new Dialog(this,this.chats);
             this.dialog1.showDialogs();

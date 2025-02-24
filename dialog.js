@@ -45,6 +45,15 @@ export class Dialog{
                         }else{
                             this.updateDialog("You don't have shit to give.",'');
                         }
+                    }else if (choice=="Give Trash"){
+                        if (this.game.inventory.includes("Trash")){
+                            this.updateDialog(value,'');
+                            this.game.inventory = this.game.inventory.filter(item => item !== 'Trash');
+                            this.game.quest["Give cat trash"]=1;
+                            this.game.npcStatus['bin']=4;
+                        }else{
+                            this.updateDialog("You don't have trash to give.",'');
+                        }
                     }else{
                         this.game.inventory.push(choice);
                         this.updateDialog(value,'')
