@@ -1,7 +1,8 @@
 import { Dialog } from './dialog.js';
 
+
 class MainScene extends Phaser.Scene {
-    constructor() {
+    constructor(dialogues) {
         super({ key: 'MainScene' });
         this.collisionHappened = false
         this.touching="";
@@ -9,13 +10,25 @@ class MainScene extends Phaser.Scene {
         this.quest={
             "Give toilet shit":0,
             "Give cat trash":0
-        }
+        };
+        this.dialogues=dialogues;
+
     }
+
+    // async fetchData(){
+    //     await fetch('https://data-bank-delta.vercel.app/')
+    //         .then(response => response.json()) // Convert response to JSON
+    //         .then(data => {
+    //             this.dialogues=data;
+    //             console.log(data);})   // Log the actual JSON data
+    //         .catch(error => console.error('Error fetching data:', error));
+    // }
 
     init(data) {
         // Receive game width & height from the constructor
         this.gameWidth = data.width;
         this.gameHeight = data.height;
+        this.dialogues = data.dialogues || {};
     }
 
     preload() { //update on new npc
@@ -24,10 +37,18 @@ class MainScene extends Phaser.Scene {
         this.load.image('bin', 'asset/trash_bin.png');
         this.load.image('apu', 'asset/apu_logo.png');
         this.load.image('toilet', 'asset/toilet.png');
-        this.load.image('cat', 'asset/cat.gif');
+        this.load.spritesheet('cat', 'asset/cat-sheet2.png', {
+            frameWidth: 247.5,  // Adjust based on your sprite sheet
+            frameHeight: 247.5
+        });
+        
     }
 
-    create() { //update on new npc
+    create() { //update on new npc'
+        // await this.fetchData();
+        console.log("hi");
+        console.log(this.dialogues);
+        console.log(this.dialogues["npc"]);
         this.bg = this.physics.add.image(0, 0, 'bg');
         this.bg.setScale(2);
 
@@ -40,8 +61,16 @@ class MainScene extends Phaser.Scene {
         this.toilet = this.physics.add.sprite(500, 0, 'toilet');
         this.toilet.setScale(0.5);
 
+        this.anims.create({
+            key: 'cat_turn',
+            frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 93 }),
+            frameRate: 30, // Adjust speed (frames per second)
+            repeat: 0 // Loop infinitely
+        });
         this.cat = this.physics.add.sprite(600, 300, 'cat');
-        this.cat.setScale(0.5);
+        this.cat.setScale(0.7);
+        this.cat.setFrame(0);
+        // this.cat.play('cat_turn');
 
         this.npcList = [this.bin, this.apu, this.toilet, this.cat]; //update on new npc
 
@@ -64,21 +93,30 @@ class MainScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
 
-        this.cursors = this.input.keyboard.createCursorKeys();
     }
 
     update() {
         let x = 0, y = 0;
 
-        if (this.cursors.left.isDown) {
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.keys = this.input.keyboard.addKeys({
+            W: Phaser.Input.Keyboard.KeyCodes.W,
+            A: Phaser.Input.Keyboard.KeyCodes.A,
+            S: Phaser.Input.Keyboard.KeyCodes.S,
+            D: Phaser.Input.Keyboard.KeyCodes.D
+        });
+        
+        // Left movement
+        if (this.cursors.left.isDown || this.keys.A.isDown) {
             x = 160;
-        } else if (this.cursors.right.isDown) {
+        } else if (this.cursors.right.isDown || this.keys.D.isDown) {
             x = -160;
         }
-
-        if (this.cursors.up.isDown) {
+        
+        // Up/down movement
+        if (this.cursors.up.isDown || this.keys.W.isDown) {
             y = 160;
-        } else if (this.cursors.down.isDown) {
+        } else if (this.cursors.down.isDown || this.keys.S.isDown) {
             y = -160;
         }
 
@@ -151,6 +189,7 @@ class MainScene extends Phaser.Scene {
             }
             this.dialog1 = new Dialog(this,this.chats);
             this.dialog1.showDialogs();
+
         }
     }
 
@@ -187,6 +226,7 @@ class MainScene extends Phaser.Scene {
     talkToCat(){
         console.log('Talking to the cat...');
         if (this.npcStatus['cat']==0){
+            this.cat.play('cat_turn');
             this.chats={
                 'Oiiai, oiiai':'',
                 'Oiiai, oiiai?':{
@@ -235,26 +275,49 @@ class MainScene extends Phaser.Scene {
 
 class Game {
     constructor(gameWidth, gameHeight) {
+        this.dialogues = {}; // Store dialogues from API
+        this.gameWidth = gameWidth;
+        this.gameHeight = gameHeight;
+        
+        this.fetchData().then(() => {
+            this.startGame(); // Start game only after fetching data
+        });
+    }
+
+    async fetchData() {
+        try {
+            const response = await fetch('https://data-bank-delta.vercel.app/');
+            const data = await response.json();
+            this.dialogues = data;  // Store API data
+            console.log("Fetched data:", data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    startGame() {
         this.config = {
             type: Phaser.AUTO,
-            width: gameWidth,
-            height: gameHeight,
+            width: this.gameWidth,
+            height: this.gameHeight,
             physics: {
                 default: 'arcade',
-                arcade: {
-                    gravity: { y: 0 },
-                    debug: false
-                }
+                arcade: { gravity: { y: 0 }, debug: false }
             },
             scene: [MainScene]
         };
 
         this.game = new Phaser.Game(this.config);
 
-        // Start the MainScene and pass gameWidth & gameHeight
-        this.game.scene.start('MainScene', { width: gameWidth, height: gameHeight });
+        // Start MainScene and pass gameWidth, gameHeight, and dialogues
+        this.game.scene.start('MainScene', { 
+            width: this.gameWidth, 
+            height: this.gameHeight,
+            dialogues: this.dialogues 
+        });
     }
 }
+
 
 // Create the game object with dynamic width & height
 const myGame = new Game(1500, 700);
