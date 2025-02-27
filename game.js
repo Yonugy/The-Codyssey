@@ -15,15 +15,6 @@ class MainScene extends Phaser.Scene {
 
     }
 
-    // async fetchData(){
-    //     await fetch('https://data-bank-delta.vercel.app/')
-    //         .then(response => response.json()) // Convert response to JSON
-    //         .then(data => {
-    //             this.dialogues=data;
-    //             console.log(data);})   // Log the actual JSON data
-    //         .catch(error => console.error('Error fetching data:', error));
-    // }
-
     init(data) {
         // Receive game width & height from the constructor
         this.gameWidth = data.width;
