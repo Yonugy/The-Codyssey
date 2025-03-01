@@ -55,8 +55,8 @@ class MainScene extends Phaser.Scene {
         this.anims.create({
             key: 'cat_turn',
             frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 93 }),
-            frameRate: 30, // Adjust speed (frames per second)
-            repeat: 0 // Loop infinitely
+            frameRate: 60, // Adjust speed (frames per second)
+            repeat: 1 // -1 = Loop infinitely
         });
         this.cat = this.physics.add.sprite(600, 300, 'cat');
         this.cat.setScale(0.7);
