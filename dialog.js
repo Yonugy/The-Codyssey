@@ -23,10 +23,12 @@ export class Dialog{
             wordWrap: { width: game.gameWidth - 120 }
         });
 
-        if (choices!=""){
+        console.log(choices.choice);
+
+        if (choices.choice){
             let i=0;
             //choice: option text; value: respond text
-            for (let [choice, value] of Object.entries(choices)){
+            for (let [choice, value] of Object.entries(choices.choice)){
                 this.option = game.add.text(60, game.gameHeight - (90-35*i), `Option ${i+1}: ${choice}`, {
                     font: '20px Arial',
                     fill: '#ffffff'
@@ -34,7 +36,7 @@ export class Dialog{
 
                 this.optionBoxes.push(this.option);
 
-                this.option.on('pointerdown', () => {
+                this.option.on('pointerdown', () => { //change the if's to react to 'respond'
                     this.destroyDialog();
                     if (choice=="Give Shit"){
                         if (this.game.inventory.includes("Shit")){
