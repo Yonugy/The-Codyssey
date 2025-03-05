@@ -36,37 +36,64 @@ export class Dialog{
 
                 this.optionBoxes.push(this.option);
 
-                this.option.on('pointerdown', () => { //change the if's to react to 'respond'
+                this.option.on('pointerdown', () => {
                     this.destroyDialog();
-                    if (choice=="Give Shit"){
-                        if (this.game.inventory.includes("Shit")){
-                            this.updateDialog(value,'');
-                            this.game.inventory = this.game.inventory.filter(item => item !== 'Shit'); //delete all Shit
-                            this.game.quest["Give toilet shit"]=1;
-                            this.game.npcStatus['bin']=2;
+
+                    if (value.item){
+                        if (value.mode=="take"){
+                            this.game.inventory.push(value.item);
+                            this.updateDialog(value.respond,'');
+                        }else if (value.mode=="give"){
+                            if (this.game.inventory.includes(value.item)){
+                                this.game.inventory = this.game.inventory.filter(item => item !== value.item); //delete all Shit
+                                this.game.fulfill.push(value.fulfill);
+                                this.updateDialog(value.yrespond,'');
+                            }else{
+                                this.updateDialog(value.nrespond,'');
+                            }
                         }else{
-                            this.updateDialog("You don't have shit to give.",'');
-                        }
-                    }else if (choice=="Give Trash"){
-                        if (this.game.inventory.includes("Trash")){
-                            this.updateDialog(value,'');
-                            this.game.inventory = this.game.inventory.filter(item => item !== 'Trash');
-                            this.game.quest["Give cat trash"]=1;
-                            this.game.npcStatus['bin']=4;
-                        }else{
-                            this.updateDialog("You don't have trash to give.",'');
+                            console.log("Invalid mode")
                         }
                     }else{
-                        this.game.inventory.push(choice);
-                        this.updateDialog(value,'')
+                        this.updateDialog(value.respond,'');
                     }
-
                 });
+
+                // this.option.on('pointerdown', () => { //change the if's to react to 'respond'
+                //     this.destroyDialog();
+                //     if (choice=="Give Shit"){
+                //         if (this.game.inventory.includes("Shit")){
+                //             this.updateDialog(value,'');
+                //             this.game.inventory = this.game.inventory.filter(item => item !== 'Shit'); //delete all Shit
+                //             this.game.quest["Give toilet shit"]=1;
+                //             this.game.npcStatus['bin']=2;
+                //         }else{
+                //             this.updateDialog("You don't have shit to give.",'');
+                //         }
+                //     }else if (choice=="Give Trash"){
+                //         if (this.game.inventory.includes("Trash")){
+                //             this.updateDialog(value,'');
+                //             this.game.inventory = this.game.inventory.filter(item => item !== 'Trash');
+                //             this.game.quest["Give cat trash"]=1;
+                //             this.game.npcStatus['bin']=4;
+                //         }else{
+                //             this.updateDialog("You don't have trash to give.",'');
+                //         }
+                //     }else{
+                //         this.game.inventory.push(choice);
+                //         this.updateDialog(value,'')
+                //     }
+
+                // });
 
                 i++;
             }
         }else{
             this.graphics.on('pointerdown', () => {
+                if (choices.fulfill){
+                    this.game.fulfill.push(choices.fulfill);
+                }
+
                 this.destroyDialog();
                 this.count++;
                 if (this.count<this.captions.length){
@@ -78,6 +105,9 @@ export class Dialog{
                 }
             });
         }
+
+        //update next quest to change activeQuest and/or activeSubQuest
+        let criteria = this.game.quest[this.game.activeQuest].subquest[this.game.activeSubQuest];
     }
 
     showDialogs(){
