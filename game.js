@@ -106,14 +106,14 @@ class MainScene extends Phaser.Scene {
             S: Phaser.Input.Keyboard.KeyCodes.S,
             D: Phaser.Input.Keyboard.KeyCodes.D
         });
-        
+
         // Left movement
         if (this.cursors.left.isDown || this.keys.A.isDown) {
             x = 160;
         } else if (this.cursors.right.isDown || this.keys.D.isDown) {
             x = -160;
         }
-        
+
         // Up/down movement
         if (this.cursors.up.isDown || this.keys.W.isDown) {
             y = 160;
@@ -152,9 +152,13 @@ class MainScene extends Phaser.Scene {
         // console.log(object.name);
         if (!this.collisionHappened) {
             this.touching=object.name;
-            let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
-            this.talkButton.setText(`Talk to ${npcName}`);
-            this.talkButton.setVisible(true);
+            if (this.dialogue[this.touching][this.activeSubQuest]){
+                let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
+                this.talkButton.setText(`Talk to ${npcName}`);
+                this.talkButton.setVisible(true);
+            }else{
+                this.talkButton.setVisible(false);
+            }
         }
     }
 }
