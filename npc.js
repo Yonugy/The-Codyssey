@@ -4,7 +4,7 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setScale(scale);
-        this.name=name
+        this.name=name;
     }
 
     talk(chats) {

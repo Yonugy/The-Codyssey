@@ -65,7 +65,7 @@ export class Dialog{
             }
         }else{
             if (choices.animation){
-                this.game.npc['cat'].play(choices.animation);
+                this.game.npc[this.game.touching].play(choices.animation);
             }
 
             this.graphics.on('pointerdown', () => {
