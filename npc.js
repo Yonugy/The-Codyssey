@@ -16,33 +16,3 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(x, y);
     }
 }
-
-// export class Npc{
-//     constructor(game,x,y,name,scale){
-//         this.game=game;
-//         this.posx=x;
-//         this.posy=y;
-//         this.name=name;
-//         this.scale=scale;
-//         this.spawn(x,y,name,scale);
-//     }
-
-//     spawn(x,y,img,scale){
-//         this.player=this.game.physics.add.image(x, y, img);
-//         this.player.setScale(scale);
-//     }
-
-//     get(){
-//         return this.player;
-//     }
-
-//     talk(chats){
-//         this.dialog1 = new Dialog(this.game,chats);
-//         this.dialog1.showDialogs();
-//     }
-
-//     move(x,y){
-//         this.player.setVelocity(x, y);
-//     }
-// }
-

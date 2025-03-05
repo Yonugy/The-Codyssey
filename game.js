@@ -130,12 +130,6 @@ class MainScene extends Phaser.Scene {
         if (!this.physics.overlap(this.player, this.npcList)) {
             this.talkButton.setVisible(false);
         }
-
-        // if (this.quest["Give toilet shit"]==1){
-        //     this.npcStatus['bin']=2;
-        // }
-
-
     }
 
     moveMap(x, y) {
@@ -143,102 +137,6 @@ class MainScene extends Phaser.Scene {
         let sprites=this.npcList.concat(this.bg);
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
-
-    // talkToBin(){
-    //     console.log('Talking to the bin...');
-    //     if (this.npcStatus['bin']==0){
-    //         this.chats={
-    //             'Do you want to live in bin or marry bin?':{
-    //                 'Live in bin':'Welcome home Ben, you definitely belong in the bin!',
-    //                 "Marry bin":"Congrats on your marriage!"
-    //             },
-    //             'Please go get some help!':'',
-    //             'Who will even want to live in bin or even marry the smelly bin.':'',
-    //             'Ben is the first one that does it no cap no aura.':'',
-    //             'Now go get the shit in the toilet.':''
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-    //         this.npcStatus['bin']=1;
-
-    //     }else if (this.npcStatus['bin']==1){
-    //         this.chats={
-    //             'Go get the shit in the toilet!':''
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-
-    //     }else if (this.npcStatus['bin']==2){
-    //         this.chats={
-    //             'Good job in getting the shit in the skibidi toilet!':'',
-    //             'Next, go get the trash in the oiia!':''
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-    //         this.npcStatus['bin']=3;
-
-    //     }else if (this.npcStatus['bin']==3){
-    //         this.chats={
-    //             'Go get the trash in the oiia!':''
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-
-    //     }else if (this.npcStatus['bin']==4){
-    //         this.chats={
-    //             'Good job':''
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-
-    //     }
-    // }
-
-    // talkToApu(){
-    //     console.log('Talking to the apu...');
-    //     if (this.npcStatus['apu']==0){
-    //             this.chats={
-    //             'What do you want?':{
-    //                 'Trash':'Here you go! Trash taking trash!',
-    //                 "Shit":"Here you go! Shit taking shit!"
-    //             }
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-    //     }
-    // }
-
-    // talkToToilet(){
-    //     console.log('Talking to the toilet...');
-    //     if (this.npcStatus['toilet']==0){
-    //         this.chats={
-    //             'Skibidi skibidi toilet!':'',
-    //             'What is your problem?':{
-    //                 "Give Shit":"HUUUURGGEHH",
-    //                 "Bye":"..."
-    //             },
-    //             "What the sigma?":""
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-    //     }
-    // }
-
-    // talkToCat(){
-    //     console.log('Talking to the cat...');
-    //     if (this.npcStatus['cat']==0){
-    //         this.cat.play('cat_turn');
-    //         this.chats={
-    //             'Oiiai, oiiai':'',
-    //             'Oiiai, oiiai?':{
-    //                 "Give Trash":"EEEEEEAAAAAAAAAAAAAAARRRRRRRRRRRRRREIR",
-    //                 "Bye":"Oiiai, oiiai"
-    //             }
-    //         }
-    //         this.dialog1 = new Dialog(this,this.chats);
-    //         this.dialog1.showDialogs();
-    //     }
-    // }
 
     talk() { //update on new npc
         this.talkButton.setVisible(false);
@@ -248,16 +146,6 @@ class MainScene extends Phaser.Scene {
         console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
-
-    //     if (this.touching=="bin"){
-    //         this.talkToBin();
-    //     }else if (this.touching=="apu"){
-    //         this.talkToApu();
-    //     }else if (this.touching=="toilet"){
-    //         this.talkToToilet();
-    //     }else if (this.touching=="cat"){
-    //         this.talkToCat();
-    //     }
     }
 
     showTalk(player, object) { //update on new npc
@@ -266,20 +154,6 @@ class MainScene extends Phaser.Scene {
             this.touching=object.name;
             let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
             this.talkButton.setText(`Talk to ${npcName}`);
-
-            // if (object === this.bin) {
-            //     this.talkButton.setText('Talk to Bin');
-            //     this.touching='bin';
-            // }else if (object === this.apu) {
-            //     this.talkButton.setText('Talk to APU');
-            //     this.touching='apu';
-            // }else if (object === this.toilet) {
-            //     this.talkButton.setText('Talk to Toilet');
-            //     this.touching='toilet';
-            // }else if (object === this.cat) {
-            //     this.talkButton.setText('Talk to Cat');
-            //     this.touching='cat';
-            // }
             this.talkButton.setVisible(true);
         }
     }

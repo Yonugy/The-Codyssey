@@ -59,39 +59,28 @@ export class Dialog{
                     }
                 });
 
-                // this.option.on('pointerdown', () => { //change the if's to react to 'respond'
-                //     this.destroyDialog();
-                //     if (choice=="Give Shit"){
-                //         if (this.game.inventory.includes("Shit")){
-                //             this.updateDialog(value,'');
-                //             this.game.inventory = this.game.inventory.filter(item => item !== 'Shit'); //delete all Shit
-                //             this.game.quest["Give toilet shit"]=1;
-                //             this.game.npcStatus['bin']=2;
-                //         }else{
-                //             this.updateDialog("You don't have shit to give.",'');
-                //         }
-                //     }else if (choice=="Give Trash"){
-                //         if (this.game.inventory.includes("Trash")){
-                //             this.updateDialog(value,'');
-                //             this.game.inventory = this.game.inventory.filter(item => item !== 'Trash');
-                //             this.game.quest["Give cat trash"]=1;
-                //             this.game.npcStatus['bin']=4;
-                //         }else{
-                //             this.updateDialog("You don't have trash to give.",'');
-                //         }
-                //     }else{
-                //         this.game.inventory.push(choice);
-                //         this.updateDialog(value,'')
-                //     }
-
-                // });
-
                 i++;
             }
         }else{
             this.graphics.on('pointerdown', () => {
                 if (choices.fulfill){
+                    let activeQuest = this.game.activeQuest;
+                    let activeSubQuest = this.game.activeSubQuest;
                     this.game.fulfill.push(choices.fulfill);
+                    let criteria = this.game.quest[activeQuest].subquest[activeSubQuest].criteria;
+                    // update next quest to change activeQuest and/or activeSubQuest
+                    if (criteria.every(item => this.game.fulfill.includes(item))) { //done subquest
+                        let nextsubquest = this.game.quest[activeQuest].subquest[activeSubQuest].nextsubquest;
+                        if (nextsubquest){
+                            if (nextsubquest==""){
+                                this.activeQuest = this.quest[activeQuest].nextquest;
+                                this.activeSubQuest = this.quest[this.activeQuest].startquest;
+                            }else{
+                                this.game.activeSubQuest=nextsubquest;
+                            }
+                        }
+
+                    }
                 }
 
                 this.destroyDialog();
@@ -101,13 +90,9 @@ export class Dialog{
                     this.updateDialog(question, this.content[question]);
                 }else{
                     game.collisionHappened=false;
-                    console.log(this.game.inventory);
                 }
             });
         }
-
-        //update next quest to change activeQuest and/or activeSubQuest
-        let criteria = this.game.quest[this.game.activeQuest].subquest[this.game.activeSubQuest];
     }
 
     showDialogs(){
