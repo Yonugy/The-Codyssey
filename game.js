@@ -41,16 +41,10 @@ class MainScene extends Phaser.Scene {
         this.bg = this.physics.add.image(0, 0, 'bg');
         this.bg.setScale(2);
 
-        // this.bin = this.physics.add.sprite(100, -100, 'bin');
-        // this.bin.setScale(0.1);
         this.npc['bin'] = new Npc(this, 100, -100, 'bin', 0.1);
 
-        // this.apu = this.physics.add.sprite(0, 200, 'apu');
-        // this.apu.setScale(0.5);
         this.npc['apu'] = new Npc(this, 0, 200, 'apu', 0.5);
 
-        // this.toilet = this.physics.add.sprite(500, 0, 'toilet');
-        // this.toilet.setScale(0.5);
         this.npc['toilet'] = new Npc(this, 500, 0, 'toilet', 0.5);
 
         this.anims.create({
@@ -59,10 +53,7 @@ class MainScene extends Phaser.Scene {
             frameRate: 60, // Adjust speed (frames per second)
             repeat: 1 // -1 = Loop infinitely
         });
-        // this.cat = this.physics.add.sprite(600, 300, 'cat');
-        // this.cat.setScale(0.7);
-        // this.cat.setFrame(0);
-        // this.cat.play('cat_turn');
+
         this.npc['cat'] = new Npc(this, 600, 300, 'cat', 0.7);
         this.npc['cat'].setFrame(0);
 
@@ -149,7 +140,6 @@ class MainScene extends Phaser.Scene {
     }
 
     showTalk(player, object) { //update on new npc
-        // console.log(object.name);
         if (!this.collisionHappened) {
             this.touching=object.name;
             if (this.dialogue[this.touching][this.activeSubQuest]){
