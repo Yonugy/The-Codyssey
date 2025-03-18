@@ -1,18 +1,30 @@
 export class Npc extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, name, scale) {
-        super(scene, x, y, name);
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
+    constructor(game, x, y, name, scale) {
+        super(game, 0, 0, name);
+        game.add.existing(this);
+        game.physics.add.existing(this);
         this.setScale(scale);
+        this.game = game;
+        this.mapPosx=x;
+        this.mapPosy=y;
+        this.setMapPos(x,y);
         this.name=name;
+        console.log(this.name,this.displayWidth,this.displayHeight);
     }
 
     talk(chats) {
-        this.dialog1 = new Dialog(this.scene, chats);
+        this.dialog1 = new Dialog(this.game, chats);
         this.dialog1.showDialogs();
     }
 
     move(x, y) {
         this.setVelocity(x, y);
+    }
+
+    setMapPos(x,y){
+        let bgscale=this.game.current_bg.scale;
+        let actualPosx=this.mapPosx*bgscale + this.game.gameWidth/2 - x*bgscale;
+        let actualPosy=this.mapPosy*bgscale + this.game.gameHeight/2 - y*bgscale;
+        this.setPosition(actualPosx,actualPosy);
     }
 }

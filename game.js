@@ -1,5 +1,6 @@
 import { Dialog } from './dialog.js';
 import { Npc } from './npc.js';
+import { Backdrop } from './backdrop.js';
 
 
 class MainScene extends Phaser.Scene {
@@ -10,6 +11,12 @@ class MainScene extends Phaser.Scene {
         this.inventory=[];
         this.fulfill=[]
         this.npc={};
+        this.backdrop={};
+        this.player_direction=-1;
+        this.current_bg;
+        this.gameposx=140;
+        this.gameposy=260;
+        this.movementSpeed=160;
     }
 
     init(data) {
@@ -21,31 +28,36 @@ class MainScene extends Phaser.Scene {
     }
 
     preload() { //update on new npc
-        this.load.image('bg', 'asset/walpaper.jpg');
+        this.cameras.main.setBackgroundColor('#E98B45');
+        this.load.image('town_bg', 'asset/town_map.jpg');
+        this.load.image('obstacle', 'asset/town_map_obstacle.png');
         this.load.image('ben', 'asset/ben.jpg');
         this.load.image('bin', 'asset/trash_bin.png');
         this.load.image('apu', 'asset/apu_logo.png');
         this.load.image('toilet', 'asset/toilet.png');
-        this.load.spritesheet('cat', 'asset/cat-sheet2.png', {
+        this.load.spritesheet('cat', 'asset/cat-sheet.png', {
             frameWidth: 247.5,  // Adjust based on your sprite sheet
             frameHeight: 247.5
         });
-        
+        this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
+            frameWidth: 128.25,  // Adjust based on your sprite sheet
+            frameHeight: 130
+        });
     }
 
     create() { //update on new npc'
-        // await this.fetchData();
-        console.log("hi");
-        console.log(this.dialogue);
-        console.log(this.dialogue["npc"]);
-        this.bg = this.physics.add.image(0, 0, 'bg');
-        this.bg.setScale(2);
+        //import background
+        // this.backdrop['town_map'] = this.physics.add.image(0, 0, 'town_bg').setScale(2);
+        // this.current_bg=this.backdrop['town_map'];
+        this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', 2);
+        this.current_bg=this.backdrop['town_map'];
 
-        this.npc['bin'] = new Npc(this, 100, -100, 'bin', 0.1);
+        //import npc
+        this.npc['bin'] = new Npc(this, 390, 260, 'bin', 0.1);
 
-        this.npc['apu'] = new Npc(this, 0, 200, 'apu', 0.5);
+        this.npc['apu'] = new Npc(this, 670, 440, 'apu', 0.5);
 
-        this.npc['toilet'] = new Npc(this, 500, 0, 'toilet', 0.5);
+        this.npc['toilet'] = new Npc(this, 980, 330, 'toilet', 0.5);
 
         this.anims.create({
             key: 'cat_turn',
@@ -54,13 +66,46 @@ class MainScene extends Phaser.Scene {
             repeat: 1 // -1 = Loop infinitely
         });
 
-        this.npc['cat'] = new Npc(this, 600, 300, 'cat', 0.7);
+        this.npc['cat'] = new Npc(this, 330, 580, 'cat', 0.7);
         this.npc['cat'].setFrame(0);
 
         this.npcList = [this.bin, this.apu, this.toilet, this.cat]; //update on new npc
 
-        this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'ben');
-        this.player.setScale(0.2);
+        //player (fighter)
+        this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
+        // this.player.setScale(0.2);
+
+        this.anims.create({
+            key: 'fighter_left',
+            frames: this.anims.generateFrameNumbers('fighter', { start: 0, end: 7 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'fighter_right',
+            frames: this.anims.generateFrameNumbers('fighter', { start: 8, end: 15 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'fighter_left_idle',
+            frames: this.anims.generateFrameNumbers('fighter', { start: 16, end: 21 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'fighter_right_idle',
+            frames: this.anims.generateFrameNumbers('fighter', { start: 24, end: 29 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        //background obstacle
+        // this.backdrop['town_obstacle'] = this.physics.add.image(0, 0, 'obstacle').setScale(2);
+        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'obstacle', 2);
 
         this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
 
@@ -85,6 +130,9 @@ class MainScene extends Phaser.Scene {
         console.log(this.activeQuest)
         console.log(this.activeSubQuest);
         console.log(this.quest[this.activeQuest].subquest[this.activeSubQuest]);
+
+        this.setGamePos(140,260);
+
     }
 
     update() {
@@ -99,22 +147,38 @@ class MainScene extends Phaser.Scene {
         });
 
         // Left movement
-        if (this.cursors.left.isDown || this.keys.A.isDown) {
-            x = 160;
-        } else if (this.cursors.right.isDown || this.keys.D.isDown) {
-            x = -160;
+        if (this.cursors.left.isDown || this.keys.A.isDown && this.current_bg.x<this.gameWidth/2-this.player.displayWidth/2) {
+            x = this.movementSpeed;
+            this.player_direction=1;
+        } else if (this.cursors.right.isDown || this.keys.D.isDown && this.current_bg.displayWidth+this.current_bg.x>this.gameWidth/2+this.player.displayWidth/2) {
+            x = -this.movementSpeed;
+            this.player_direction=-1;
         }
 
         // Up/down movement
-        if (this.cursors.up.isDown || this.keys.W.isDown) {
-            y = 160;
-        } else if (this.cursors.down.isDown || this.keys.S.isDown) {
-            y = -160;
+        if (this.cursors.up.isDown || this.keys.W.isDown && this.current_bg.y<this.gameHeight/2-this.player.displayHeight/2) {
+            y = this.movementSpeed;
+        } else if (this.cursors.down.isDown || this.keys.S.isDown && this.current_bg.displayHeight+this.current_bg.y>this.gameHeight/2+this.player.displayHeight/2) {
+            y = -this.movementSpeed;
         }
 
         if (this.collisionHappened) {
             this.moveMap(0,0);
         }else{
+            if (x==0 && y==0) {
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left_idle', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right_idle', true);
+                }
+            }else{
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right', true);
+                }
+            }
+
             this.moveMap(x, y);
         }
 
@@ -125,8 +189,14 @@ class MainScene extends Phaser.Scene {
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(this.bg);
+        let sprites=this.npcList.concat(Object.values(this.backdrop));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
+    }
+
+    setGamePos(x, y) {
+        //add npc or game objects into the list to follow map to move
+        let sprites=this.npcList.concat(Object.values(this.backdrop));
+        sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
     talk() { //update on new npc
@@ -194,7 +264,7 @@ class Game {
         this.game = new Phaser.Game(this.config);
 
         // Start MainScene and pass gameWidth, gameHeight, and dialogues
-        this.game.scene.start('MainScene', { 
+        this.game.scene.start('MainScene', {
             width: this.gameWidth,
             height: this.gameHeight,
             dialogue: this.dialogue,
