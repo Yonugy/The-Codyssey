@@ -1,25 +1,16 @@
-const express = require('express');
+const express = require("express");
+const path = require("path");
+
 const app = express();
+const port = process.env.PORT || 5500;
 
-const allowedOrigins = [
-    "http://127.0.0.1:5500"
-]
+// Serve frontend (static files from root)
+app.use(express.static(path.join(__dirname, "..")));
 
-const cors = require('cors');
-
-const corsOptions = {
-    origin: 'http://127.0.0.1:5500', // Replace with your frontend URL
-    methods: 'GET,POST', // Allowed HTTP methods
-};
-
-app.use(cors(corsOptions));
-
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "main.html"));
 });
 
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
