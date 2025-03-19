@@ -9,7 +9,6 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         this.mapPosy=y;
         this.setMapPos(x,y);
         this.name=name;
-        console.log(this.name,this.displayWidth,this.displayHeight);
     }
 
     talk(chats) {
@@ -17,9 +16,9 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         this.dialog1.showDialogs();
     }
 
-    move(x, y) {
-        this.setVelocity(x, y);
-    }
+    // move(x, y) {
+    //     this.setVelocity(x, y);
+    // }
 
     setMapPos(x,y){
         let bgscale=this.game.current_bg.scale;

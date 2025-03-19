@@ -1,6 +1,7 @@
 import { Dialog } from './dialog.js';
 import { Npc } from './npc.js';
 import { Backdrop } from './backdrop.js';
+import { House } from './house.js';
 
 
 class MainScene extends Phaser.Scene {
@@ -12,11 +13,12 @@ class MainScene extends Phaser.Scene {
         this.fulfill=[]
         this.npc={};
         this.backdrop={};
+        this.house={};
         this.player_direction=-1;
         this.current_bg;
         this.gameposx=140;
         this.gameposy=260;
-        this.movementSpeed=160;
+        this.movementSpeed=200;
     }
 
     init(data) {
@@ -30,7 +32,8 @@ class MainScene extends Phaser.Scene {
     preload() { //update on new npc
         this.cameras.main.setBackgroundColor('#E98B45');
         this.load.image('town_bg', 'asset/town_map.jpg');
-        this.load.image('obstacle', 'asset/town_map_obstacle.png');
+        this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
+        this.load.image('house1_bg', 'asset/town_map.jpg');
         this.load.image('ben', 'asset/ben.jpg');
         this.load.image('bin', 'asset/trash_bin.png');
         this.load.image('apu', 'asset/apu_logo.png');
@@ -53,7 +56,7 @@ class MainScene extends Phaser.Scene {
         this.current_bg=this.backdrop['town_map'];
 
         //import npc
-        this.npc['bin'] = new Npc(this, 390, 260, 'bin', 0.1);
+        this.npc['bin'] = new Npc(this, 390, 400, 'bin', 0.1);
 
         this.npc['apu'] = new Npc(this, 670, 440, 'apu', 0.5);
 
@@ -104,11 +107,14 @@ class MainScene extends Phaser.Scene {
         });
 
         //background obstacle
-        // this.backdrop['town_obstacle'] = this.physics.add.image(0, 0, 'obstacle').setScale(2);
-        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'obstacle', 2);
+        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
+
+        //house collision area
+        this.house['house1'] = new House(this, 369, 240, 409, 292, '#000', 'House 1');
 
         this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
 
+        //Talk to npc button
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
             fontSize: '24px',
             fill: '#ffffff',
@@ -121,8 +127,23 @@ class MainScene extends Phaser.Scene {
         });
         this.talkButton.setVisible(false);
 
+        //Enter house button
+        this.enterButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Enter house', {
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        })
+        .setPadding(10)
+        .setInteractive() // Make the text clickable
+        .on('pointerdown', () => {
+            this.enterHouse();
+        });
+        this.enterButton.setVisible(false);
+
         this.npcList = Object.values(this.npc);
         this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
+        this.houseList = Object.values(this.house);
+        this.physics.add.overlap(this.player, this.houseList, this.showEnter, null, this);
 
         //set initial quest and subquest in the beginning
         this.activeQuest = this.quest.init;
@@ -185,17 +206,21 @@ class MainScene extends Phaser.Scene {
         if (!this.physics.overlap(this.player, this.npcList)) {
             this.talkButton.setVisible(false);
         }
+
+        if (!this.physics.overlap(this.player, this.houseList)) {
+            this.enterButton.setVisible(false);
+        }
     }
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.house));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
 
     setGamePos(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.house));
         sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
@@ -209,6 +234,16 @@ class MainScene extends Phaser.Scene {
         this.dialog1.showDialogs();
     }
 
+    enterHouse() { //update on new npc
+        this.enterButton.setVisible(false);
+        this.collisionHappened = true;
+        console.log(`Entering ${this.touching}...`);
+        // let chats=this.dialogue[this.touching][this.activeSubQuest];
+        // console.log(chats);
+        // this.dialog1 = new Dialog(this,chats);
+        // this.dialog1.showDialogs();
+    }
+
     showTalk(player, object) { //update on new npc
         if (!this.collisionHappened) {
             this.touching=object.name;
@@ -219,6 +254,15 @@ class MainScene extends Phaser.Scene {
             }else{
                 this.talkButton.setVisible(false);
             }
+        }
+    }
+
+    showEnter(player, object) { //update on new npc
+        if (!this.collisionHappened) {
+            this.touching=object.name;
+            let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
+            this.enterButton.setText(`Enter ${npcName}`);
+            this.enterButton.setVisible(true);
         }
     }
 }
