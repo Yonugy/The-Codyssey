@@ -110,7 +110,7 @@ class MainScene extends Phaser.Scene {
         this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
 
         //house collision area
-        this.house['house1'] = new House(this, 369, 240, 409, 292, '#000', 'House 1');
+        this.house['house1'] = new House(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
 
         this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
 
@@ -168,18 +168,18 @@ class MainScene extends Phaser.Scene {
         });
 
         // Left movement
-        if (this.cursors.left.isDown || this.keys.A.isDown && this.current_bg.x<this.gameWidth/2-this.player.displayWidth/2) {
+        if ((this.cursors.left.isDown || this.keys.A.isDown) && this.current_bg.x<this.gameWidth/2-this.player.displayWidth/2) {
             x = this.movementSpeed;
             this.player_direction=1;
-        } else if (this.cursors.right.isDown || this.keys.D.isDown && this.current_bg.displayWidth+this.current_bg.x>this.gameWidth/2+this.player.displayWidth/2) {
+        } else if ((this.cursors.right.isDown || this.keys.D.isDown) && this.current_bg.displayWidth+this.current_bg.x>this.gameWidth/2+this.player.displayWidth/2) {
             x = -this.movementSpeed;
             this.player_direction=-1;
         }
 
         // Up/down movement
-        if (this.cursors.up.isDown || this.keys.W.isDown && this.current_bg.y<this.gameHeight/2-this.player.displayHeight/2) {
+        if ((this.cursors.up.isDown || this.keys.W.isDown) && this.current_bg.y<this.gameHeight/2-this.player.displayHeight/2) {
             y = this.movementSpeed;
-        } else if (this.cursors.down.isDown || this.keys.S.isDown && this.current_bg.displayHeight+this.current_bg.y>this.gameHeight/2+this.player.displayHeight/2) {
+        } else if ((this.cursors.down.isDown || this.keys.S.isDown) && this.current_bg.displayHeight+this.current_bg.y>this.gameHeight/2+this.player.displayHeight/2) {
             y = -this.movementSpeed;
         }
 
