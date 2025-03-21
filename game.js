@@ -2,6 +2,8 @@ import { Dialog } from './dialog.js';
 import { Npc } from './npc.js';
 import { Backdrop } from './backdrop.js';
 import { House } from './house.js';
+import { IndoorScene } from './indoorScene.js';
+
 
 
 class MainScene extends Phaser.Scene {
@@ -71,8 +73,6 @@ class MainScene extends Phaser.Scene {
 
         this.npc['cat'] = new Npc(this, 330, 580, 'cat', 0.7);
         this.npc['cat'].setFrame(0);
-
-        this.npcList = [this.bin, this.apu, this.toilet, this.cat]; //update on new npc
 
         //player (fighter)
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
@@ -238,6 +238,7 @@ class MainScene extends Phaser.Scene {
         this.enterButton.setVisible(false);
         this.collisionHappened = true;
         console.log(`Entering ${this.touching}...`);
+        this.startIndoor();
         // let chats=this.dialogue[this.touching][this.activeSubQuest];
         // console.log(chats);
         // this.dialog1 = new Dialog(this,chats);
@@ -264,6 +265,32 @@ class MainScene extends Phaser.Scene {
             this.enterButton.setText(`Enter ${npcName}`);
             this.enterButton.setVisible(true);
         }
+    }
+
+    startIndoor() {
+        // this.config = {
+        //     type: Phaser.AUTO,
+        //     width: this.gameWidth,
+        //     height: this.gameHeight,
+        //     physics: {
+        //         default: 'arcade',
+        //         arcade: { gravity: { y: 0 }, debug: false }
+        //     },
+        //     scene: [IndoorScene]
+        // };
+
+        // this.newGame = new Phaser.Game(this.config);
+
+        // this.scene.pause("MainScene");
+        this.cameras.main.fadeOut(2000, 0, 0, 0);
+
+        // Start IndoorScene and pass gameWidth, gameHeight
+        this.scene.start('IndoorScene', {
+            width: this.gameWidth,
+            height: this.gameHeight,
+        });
+        // this.scene.bringToTop("IndoorScene");
+
     }
 }
 
@@ -302,7 +329,7 @@ class Game {
                 default: 'arcade',
                 arcade: { gravity: { y: 0 }, debug: false }
             },
-            scene: [MainScene]
+            scene: [MainScene,IndoorScene]
         };
 
         this.game = new Phaser.Game(this.config);
