@@ -10,9 +10,9 @@ export class Backdrop extends Phaser.Physics.Arcade.Sprite {
         this.setOrigin(0, 0);
     }
 
-    move(x, y) {
-        this.setVelocity(x, y);
-    }
+    // move(x, y) {
+    //     this.setVelocity(x, y);
+    // }
 
     setMapPos(x,y){
         let bgscale=this.game.current_bg.scale;
