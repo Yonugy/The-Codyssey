@@ -1,7 +1,7 @@
 import { Dialog } from './dialog.js';
 import { Npc } from './npc.js';
 import { Backdrop } from './backdrop.js';
-import { House } from './house.js';
+import { Door } from './door.js';
 import { IndoorScene } from './indoorScene.js';
 
 
@@ -15,7 +15,7 @@ class MainScene extends Phaser.Scene {
         this.fulfill=[]
         this.npc={};
         this.backdrop={};
-        this.house={};
+        this.door={};
         this.player_direction=-1;
         this.current_bg;
         this.gameposx=140;
@@ -48,6 +48,7 @@ class MainScene extends Phaser.Scene {
             frameWidth: 128.25,  // Adjust based on your sprite sheet
             frameHeight: 130
         });
+        this.load.image("houseInterior", "asset/house1_interior.png");
     }
 
     create() { //update on new npc'
@@ -110,7 +111,7 @@ class MainScene extends Phaser.Scene {
         this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
 
         //house collision area
-        this.house['house1'] = new House(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
+        this.door['house1'] = new Door(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
 
         this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
 
@@ -136,14 +137,14 @@ class MainScene extends Phaser.Scene {
         .setPadding(10)
         .setInteractive() // Make the text clickable
         .on('pointerdown', () => {
-            this.enterHouse();
+            this.enterDoor();
         });
         this.enterButton.setVisible(false);
 
         this.npcList = Object.values(this.npc);
         this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
-        this.houseList = Object.values(this.house);
-        this.physics.add.overlap(this.player, this.houseList, this.showEnter, null, this);
+        this.doorList = Object.values(this.door);
+        this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         //set initial quest and subquest in the beginning
         this.activeQuest = this.quest.init;
@@ -207,20 +208,20 @@ class MainScene extends Phaser.Scene {
             this.talkButton.setVisible(false);
         }
 
-        if (!this.physics.overlap(this.player, this.houseList)) {
+        if (!this.physics.overlap(this.player, this.doorList)) {
             this.enterButton.setVisible(false);
         }
     }
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.house));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
 
     setGamePos(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.house));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
         sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
@@ -234,15 +235,11 @@ class MainScene extends Phaser.Scene {
         this.dialog1.showDialogs();
     }
 
-    enterHouse() { //update on new npc
+    enterDoor() { //update on new npc
         this.enterButton.setVisible(false);
-        this.collisionHappened = true;
+        // this.collisionHappened = true;
         console.log(`Entering ${this.touching}...`);
-        this.startIndoor();
-        // let chats=this.dialogue[this.touching][this.activeSubQuest];
-        // console.log(chats);
-        // this.dialog1 = new Dialog(this,chats);
-        // this.dialog1.showDialogs();
+        this.startIndoor(this.touching);
     }
 
     showTalk(player, object) { //update on new npc
@@ -267,30 +264,14 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    startIndoor() {
-        // this.config = {
-        //     type: Phaser.AUTO,
-        //     width: this.gameWidth,
-        //     height: this.gameHeight,
-        //     physics: {
-        //         default: 'arcade',
-        //         arcade: { gravity: { y: 0 }, debug: false }
-        //     },
-        //     scene: [IndoorScene]
-        // };
-
-        // this.newGame = new Phaser.Game(this.config);
-
+    startIndoor(houseName) {
         // this.scene.pause("MainScene");
-        this.cameras.main.fadeOut(2000, 0, 0, 0);
-
-        // Start IndoorScene and pass gameWidth, gameHeight
-        this.scene.start('IndoorScene', {
+        // this.cameras.main.fadeOut(2000);
+        this.scene.switch('IndoorScene', {
             width: this.gameWidth,
             height: this.gameHeight,
+            houseName:houseName,
         });
-        // this.scene.bringToTop("IndoorScene");
-
     }
 }
 

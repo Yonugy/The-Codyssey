@@ -1,4 +1,6 @@
 import { Backdrop } from './backdrop.js';
+import { Door } from './door.js';
+
 
 export class IndoorScene extends Phaser.Scene {
     constructor() {
@@ -9,7 +11,7 @@ export class IndoorScene extends Phaser.Scene {
         this.fulfill=[]
         this.npc={};
         this.backdrop={};
-        this.house={};
+        this.door={};
         this.player_direction=-1;
         this.current_bg;
         this.gameposx=140;
@@ -21,16 +23,12 @@ export class IndoorScene extends Phaser.Scene {
         // Receive game width & height from the constructor
         this.gameWidth = data.width;
         this.gameHeight = data.height;
+        this.houseName = data.houseName;
     }
 
     preload() {
-        this.cameras.main.setBackgroundColor('#098B45');
-        // Load assets for the house interior
-        this.load.image("houseInterior", "asset/house1_interior.png");
-        this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
-            frameWidth: 128.25,  // Adjust based on your sprite sheet
-            frameHeight: 130
-        });
+        this.cameras.main.setBackgroundColor('#4F546B');
+
     }
 
     create() {
@@ -41,6 +39,26 @@ export class IndoorScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
 
         this.npcList = Object.values(this.npc);
+
+        this.door['exit'] = new Door(this, 384, 832, 443, 895, '#000', 'Exit');
+
+        this.doorList = Object.values(this.door);
+        this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
+
+        this.enterButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Enter house', {
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        })
+        .setPadding(10)
+        .setInteractive() // Make the text clickable
+        .on('pointerdown', () => {
+            this.enterDoor();
+        });
+        this.enterButton.setVisible(false);
+
+        this.setGamePos(415,780);
+        console.log(this.houseName);
         
     }
 
@@ -90,16 +108,60 @@ export class IndoorScene extends Phaser.Scene {
 
             this.moveMap(x, y);
         }
+
+        if (!this.physics.overlap(this.player, this.doorList)) {
+            this.enterButton.setVisible(false);
+        }
+    }
+
+    showEnter(player, object) {
+        if (!this.collisionHappened) {
+            this.touching=object.name;
+            if (this.touching=="Exit"){
+                this.enterButton.setText(`Exit ${this.houseName}`);
+            }else{
+                let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
+                this.enterButton.setText(`Enter ${npcName}`);
+            }
+            this.enterButton.setVisible(true);
+        }
+    }
+
+    enterDoor() {
+        this.enterButton.setVisible(false);
+        console.log(`Entering ${this.touching}...`);
+        if (this.touching=="Exit"){
+            this.exitHouse()
+        }else{
+            this.startIndoor(this.touching);
+        }
+    }
+
+    startIndoor(houseName) {
+        // this.scene.pause("MainScene");
+        this.cameras.main.fadeOut(2000);
+        this.scene.start('IndoorScene', {
+            width: this.gameWidth,
+            height: this.gameHeight,
+            houseName: houseName,
+        });
     }
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.house));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
+    }
+
+    setGamePos(x, y) {
+        //add npc or game objects into the list to follow map to move
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
+        sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
     exitHouse() {
         console.log("Exiting house...");
-        this.scene.start("MainScene", { playerX: 100, playerY: 200 }); // Go back outside
+        this.scene.switch("MainScene");
+        this.scene.stop("IndoorScene");
     }
 }

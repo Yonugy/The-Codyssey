@@ -1,4 +1,4 @@
-export class House extends Phaser.Physics.Arcade.Sprite {
+export class Door extends Phaser.Physics.Arcade.Sprite {
     constructor(game, x1, y1, x2, y2, color, name, alpha = 0) {
         let bgscale=game.current_bg.scale;
         let width = (x2 - x1)*bgscale;
