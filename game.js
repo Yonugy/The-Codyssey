@@ -29,6 +29,8 @@ class MainScene extends Phaser.Scene {
         this.gameHeight = data.height;
         this.dialogue = data.dialogue || {};
         this.quest = data.quest || {};
+        // this.door = data.door || {};
+        // this.indoor = data.indoor || {};
     }
 
     preload() { //update on new npc
@@ -48,7 +50,8 @@ class MainScene extends Phaser.Scene {
             frameWidth: 128.25,  // Adjust based on your sprite sheet
             frameHeight: 130
         });
-        this.load.image("houseInterior", "asset/house1_interior.png");
+        this.load.image("house1_interior", "asset/house1_interior.png");
+        this.load.image("ownhouse_interior", "asset/ownhouse_interior.jpg");
     }
 
     create() { //update on new npc'
@@ -110,7 +113,7 @@ class MainScene extends Phaser.Scene {
         //background obstacle
         this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
 
-        //house collision area
+        //house collision area (door)
         this.door['house1'] = new Door(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
 
         this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
@@ -279,6 +282,8 @@ class Game {
     constructor(gameWidth, gameHeight) {
         this.dialogue = {}; // Store dialogues from API
         this.quest = {};
+        this.door = {};
+        this.indoor = {};
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
         this.fetchData().then(() => {
@@ -290,10 +295,16 @@ class Game {
         try {
             const response1 = await fetch('https://data-bank-delta.vercel.app/');
             const response2 = await fetch('https://data-bank-delta.vercel.app/quest');
+            const response3 = await fetch('https://data-bank-delta.vercel.app/door');
+            const response4 = await fetch('https://data-bank-delta.vercel.app/indoor');
             const data1 = await response1.json();
             const data2 = await response2.json();
+            const data3 = await response3.json();
+            const data4 = await response4.json();
             this.dialogue = data1;  // Store API data
             this.quest = data2;
+            this.door = data3;
+            this.indoor = data4;
             console.log("Fetched data 1:", data1);
             console.log("Fetched data 2:", data2);
         } catch (error) {
@@ -320,7 +331,9 @@ class Game {
             width: this.gameWidth,
             height: this.gameHeight,
             dialogue: this.dialogue,
-            quest: this.quest
+            quest: this.quest,
+            door: this.door,
+            indoor: this.indoor
         });
     }
 }

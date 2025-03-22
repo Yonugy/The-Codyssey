@@ -33,10 +33,11 @@ export class IndoorScene extends Phaser.Scene {
 
     create() {
         console.log("Entered House Interior");
-        this.backdrop['house_map'] = new Backdrop(this, 0, 0, 'houseInterior', 1.2);
+        this.backdrop['house_map'] = new Backdrop(this, 0, 0, 'house1_interior', 1.2);
         this.current_bg=this.backdrop['house_map'];
 
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
+        this.player_direction=-1;
 
         this.npcList = Object.values(this.npc);
 

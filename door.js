@@ -32,4 +32,8 @@ export class Door extends Phaser.Physics.Arcade.Sprite {
         let actualPosy=this.mapPosy*bgscale + this.game.gameHeight/2 - y*bgscale;
         this.setPosition(actualPosx,actualPosy);
     }
+
+    enter(){
+        
+    }
 }
