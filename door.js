@@ -1,5 +1,5 @@
 export class Door extends Phaser.Physics.Arcade.Sprite {
-    constructor(game, x1, y1, x2, y2, color, name, alpha = 0) {
+    constructor(game, x1, y1, x2, y2, color, label, target="", alpha = 0) {
         let bgscale=game.current_bg.scale;
         let width = (x2 - x1)*bgscale;
         let height = (y2 - y1)*bgscale;
@@ -18,7 +18,8 @@ export class Door extends Phaser.Physics.Arcade.Sprite {
         game.physics.add.existing(this);
 
         this.game=game;
-        this.name=name;
+        this.label=label; //"label" of indoor (Beh's House / Exit)
+        this.target=target; //"to" of a door  (   house1   / ""  )
         this.mapPosx=(x1+x2)/2;
         this.mapPosy=(y1+y2)/2;
 

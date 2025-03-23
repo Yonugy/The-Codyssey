@@ -10,12 +10,12 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MainScene' });
         this.collisionHappened = false
-        this.touching="";
+        this.touching;
         this.inventory=[];
         this.fulfill=[]
         this.npc={};
         this.backdrop={};
-        this.door={};
+        this.doors={};
         this.player_direction=-1;
         this.current_bg;
         this.gameposx=140;
@@ -27,10 +27,11 @@ class MainScene extends Phaser.Scene {
         // Receive game width & height from the constructor
         this.gameWidth = data.width;
         this.gameHeight = data.height;
+        this.sceneName = data.sceneName;
         this.dialogue = data.dialogue || {};
         this.quest = data.quest || {};
-        // this.door = data.door || {};
-        // this.indoor = data.indoor || {};
+        this.alldoor = data.door || {};
+        this.indoor = data.indoor || {};
     }
 
     preload() { //update on new npc
@@ -114,7 +115,16 @@ class MainScene extends Phaser.Scene {
         this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
 
         //house collision area (door)
-        this.door['house1'] = new Door(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
+        // this.door['house1'] = new Door(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
+        let doorData = this.alldoor[this.sceneName] //list of door of the current scene
+        for (let door of doorData){ //dictionary contains info of a door
+            if (door.to){ //not an exit (exit dont have "to")
+                let indoorDetail = this.indoor[door.to]; //target indoor detail
+                let label = indoorDetail.label; //indoor label for action text
+                let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
+            }
+        }
 
         this.npcStatus={'bin':0, "apu":0, "toilet":0, "cat":0}; //update on new npc
 
@@ -146,7 +156,7 @@ class MainScene extends Phaser.Scene {
 
         this.npcList = Object.values(this.npc);
         this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
-        this.doorList = Object.values(this.door);
+        this.doorList = Object.values(this.doors);
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         //set initial quest and subquest in the beginning
@@ -218,38 +228,49 @@ class MainScene extends Phaser.Scene {
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
 
     setGamePos(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
     talk() { //update on new npc
         this.talkButton.setVisible(false);
         this.collisionHappened = true;
-        console.log(`Talking to the ${this.touching}...`);
-        let chats=this.dialogue[this.touching][this.activeSubQuest];
+        let objectName = this.touching.name;
+        console.log(`Talking to the ${objectName}...`);
+        let chats=this.dialogue[objectName][this.activeSubQuest];
         console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
     }
 
-    enterDoor() { //update on new npc
+    enterDoor() {
         this.enterButton.setVisible(false);
+        let objectName = this.touching.label;
         // this.collisionHappened = true;
-        console.log(`Entering ${this.touching}...`);
-        this.startIndoor(this.touching);
+        console.log(`Entering ${objectName}...`);
+        // this.startIndoor(this.touching);
+        let indoorDetail = this.indoor[this.touching.target]; //target is "to" of a door
+        this.scene.switch('IndoorScene', {
+            width: this.gameWidth,
+            height: this.gameHeight,
+            indoorData: this.indoor,
+            doorData: this.alldoor,
+            sceneName: this.touching.target,
+        });
     }
 
     showTalk(player, object) { //update on new npc
         if (!this.collisionHappened) {
-            this.touching=object.name;
-            if (this.dialogue[this.touching][this.activeSubQuest]){
-                let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
+            this.touching=object;
+            let objectName = object.name;
+            if (this.dialogue[objectName][this.activeSubQuest]){
+                let npcName=objectName.charAt(0).toUpperCase() + objectName.slice(1);
                 this.talkButton.setText(`Talk to ${npcName}`);
                 this.talkButton.setVisible(true);
             }else{
@@ -260,9 +281,9 @@ class MainScene extends Phaser.Scene {
 
     showEnter(player, object) { //update on new npc
         if (!this.collisionHappened) {
-            this.touching=object.name;
-            let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
-            this.enterButton.setText(`Enter ${npcName}`);
+            this.touching=object; //door.name (Your House etc)
+            let objectName = object.label;
+            this.enterButton.setText(`Enter ${objectName}`);
             this.enterButton.setVisible(true);
         }
     }
@@ -326,14 +347,17 @@ class Game {
 
         this.game = new Phaser.Game(this.config);
 
+        let sceneName = "town";
+
         // Start MainScene and pass gameWidth, gameHeight, and dialogues
         this.game.scene.start('MainScene', {
             width: this.gameWidth,
             height: this.gameHeight,
+            sceneName: sceneName,
             dialogue: this.dialogue,
             quest: this.quest,
             door: this.door,
-            indoor: this.indoor
+            indoor: this.indoor,
         });
     }
 }
