@@ -11,7 +11,7 @@ export class IndoorScene extends Phaser.Scene {
         this.fulfill=[]
         this.npc={};
         this.backdrop={};
-        this.door={};
+        this.doors={};
         this.player_direction=-1;
         this.current_bg;
         this.gameposx=140;
@@ -23,7 +23,9 @@ export class IndoorScene extends Phaser.Scene {
         // Receive game width & height from the constructor
         this.gameWidth = data.width;
         this.gameHeight = data.height;
-        this.houseName = data.houseName;
+        this.indoor = data.indoorData;
+        this.alldoor = data.doorData;
+        this.sceneName = data.sceneName;
     }
 
     preload() {
@@ -33,16 +35,32 @@ export class IndoorScene extends Phaser.Scene {
 
     create() {
         console.log("Entered House Interior");
-        this.backdrop['house_map'] = new Backdrop(this, 0, 0, 'houseInterior', 1.2);
+        let indoorDetail = this.indoor[this.sceneName];
+
+        this.backdrop['house_map'] = new Backdrop(this, 0, 0, indoorDetail.img, indoorDetail.scale);
         this.current_bg=this.backdrop['house_map'];
+        // this.current_bg = new Backdrop(this, 0, 0, this.indoorData.img, this.indoorData.scale)
 
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
+        this.player_direction=-1;
 
         this.npcList = Object.values(this.npc);
 
-        this.door['exit'] = new Door(this, 384, 832, 443, 895, '#000', 'Exit');
+        // this.door['exit'] = new Door(this, 384, 832, 443, 895, '#000', 'Exit');
+        let doorData = this.alldoor[this.sceneName]
+        for (let door of doorData){ //dictionary contains info of a door
+            if (door.to){ //not an exit (exit dont have "to")
+                let indoorDetail = this.indoor[door.to]; //target indoor detail
+                let label = indoorDetail.label; //indoor label for action text
+                let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
+            }else{
+                let doorPos = door.position;
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit");
+            }
+        }
 
-        this.doorList = Object.values(this.door);
+        this.doorList = Object.values(this.doors);
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         this.enterButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Enter house', {
@@ -57,9 +75,8 @@ export class IndoorScene extends Phaser.Scene {
         });
         this.enterButton.setVisible(false);
 
-        this.setGamePos(415,780);
-        console.log(this.houseName);
-        
+        let spawnPos = indoorDetail.spawn; //dictionary contains {x:? , y:?}
+        this.setGamePos(spawnPos.x,spawnPos.y);
     }
 
     update() {
@@ -116,12 +133,13 @@ export class IndoorScene extends Phaser.Scene {
 
     showEnter(player, object) {
         if (!this.collisionHappened) {
-            this.touching=object.name;
-            if (this.touching=="Exit"){
-                this.enterButton.setText(`Exit ${this.houseName}`);
+            this.touching=object; //door.name (Your House etc)
+            let objectName = object.label;
+            if (objectName=="Exit"){
+                let houseName = this.indoor[this.sceneName].label;
+                this.enterButton.setText(`Exit ${houseName}`);
             }else{
-                let npcName=object.name.charAt(0).toUpperCase() + object.name.slice(1);
-                this.enterButton.setText(`Enter ${npcName}`);
+                this.enterButton.setText(`Enter ${objectName}`);
             }
             this.enterButton.setVisible(true);
         }
@@ -129,33 +147,32 @@ export class IndoorScene extends Phaser.Scene {
 
     enterDoor() {
         this.enterButton.setVisible(false);
-        console.log(`Entering ${this.touching}...`);
-        if (this.touching=="Exit"){
+        let objectName = this.touching.label;
+        console.log(`Entering ${objectName}...`);
+        if (objectName=="Exit"){
+            //exit current indoor
             this.exitHouse()
         }else{
-            this.startIndoor(this.touching);
+            //go indoor
+            let indoorDetail = this.indoor[this.touching.target]; //target is "to" of a door
+            this.scene.switch('IndoorScene', {
+                width: this.gameWidth,
+                height: this.gameHeight,
+                indoorData: indoorDetail,
+                sceneName: this.touching.target,
+            });
         }
-    }
-
-    startIndoor(houseName) {
-        // this.scene.pause("MainScene");
-        this.cameras.main.fadeOut(2000);
-        this.scene.start('IndoorScene', {
-            width: this.gameWidth,
-            height: this.gameHeight,
-            houseName: houseName,
-        });
     }
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
 
     setGamePos(x, y) {
         //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.door));
+        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
