@@ -32,6 +32,7 @@ class MainScene extends Phaser.Scene {
         this.quest = data.quest || {};
         this.alldoor = data.door || {};
         this.indoor = data.indoor || {};
+        this.allnpc = data.npc || {};
     }
 
     preload() { //update on new npc
@@ -53,31 +54,55 @@ class MainScene extends Phaser.Scene {
         });
         this.load.image("house1_interior", "asset/house1_interior.png");
         this.load.image("ownhouse_interior", "asset/ownhouse_interior.jpg");
+
+        for (let [tag,npc] of Object.entries(this.allnpc)){
+            if (npc.type === "image") {
+                this.load.image(tag, `asset/${npc.img}`);
+            }else if (npc.type === "spritesheet"){
+                this.load.spritesheet(tag, `asset/${npc.img}`, {
+                    frameWidth: npc.frameSize.width,
+                    frameHeight: npc.frameSize.height
+                });
+            }
+        }
     }
 
-    create() { //update on new npc'
+    create() {
         //import background
-        // this.backdrop['town_map'] = this.physics.add.image(0, 0, 'town_bg').setScale(2);
-        // this.current_bg=this.backdrop['town_map'];
         this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', 2);
         this.current_bg=this.backdrop['town_map'];
 
         //import npc
-        this.npc['bin'] = new Npc(this, 390, 400, 'bin', 0.1);
+        for (let [tag,npc] of Object.entries(this.allnpc)){
+            this.npc[tag] = new Npc(this, 390, 400, tag, npc.name, npc.scale);
+            if (npc.animation){
+                for (let [key,anim] of Object.entries(npc.animation)){
+                    this.anims.create({
+                        key: key,
+                        frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
+                        frameRate: anim.frameRate, // Adjust speed (frames per second)
+                        repeat: anim.repeat // -1 = Loop infinitely
+                    });
+                }
+                this.npc[tag].setFrame(npc.initialFrame);
+            }
+        }
 
-        this.npc['apu'] = new Npc(this, 670, 440, 'apu', 0.5);
+        // this.npc['bin'] = new Npc(this, 390, 400, 'bin', 0.1);
 
-        this.npc['toilet'] = new Npc(this, 980, 330, 'toilet', 0.5);
+        // this.npc['apu'] = new Npc(this, 670, 440, 'apu', 0.5);
 
-        this.anims.create({
-            key: 'cat_turn',
-            frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 93 }),
-            frameRate: 60, // Adjust speed (frames per second)
-            repeat: 1 // -1 = Loop infinitely
-        });
+        // this.npc['toilet'] = new Npc(this, 980, 330, 'toilet', 0.5);
 
-        this.npc['cat'] = new Npc(this, 330, 580, 'cat', 0.7);
-        this.npc['cat'].setFrame(0);
+        // this.anims.create({
+        //     key: 'cat_turn',
+        //     frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 93 }),
+        //     frameRate: 60, // Adjust speed (frames per second)
+        //     repeat: 1 // -1 = Loop infinitely
+        // });
+
+        // this.npc['cat'] = new Npc(this, 330, 580, 'cat', 0.7);
+        // this.npc['cat'].setFrame(0);
 
         //player (fighter)
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
@@ -241,9 +266,9 @@ class MainScene extends Phaser.Scene {
     talk() { //update on new npc
         this.talkButton.setVisible(false);
         this.collisionHappened = true;
-        let objectName = this.touching.name;
-        console.log(`Talking to the ${objectName}...`);
-        let chats=this.dialogue[objectName][this.activeSubQuest];
+        let object = this.touching;
+        console.log(`Talking to the ${object.name}...`);
+        let chats=this.dialogue[object.tag][this.activeSubQuest];
         console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
@@ -268,10 +293,8 @@ class MainScene extends Phaser.Scene {
     showTalk(player, object) { //update on new npc
         if (!this.collisionHappened) {
             this.touching=object;
-            let objectName = object.name;
-            if (this.dialogue[objectName][this.activeSubQuest]){
-                let npcName=objectName.charAt(0).toUpperCase() + objectName.slice(1);
-                this.talkButton.setText(`Talk to ${npcName}`);
+            if (this.dialogue[object.tag][this.activeSubQuest]){
+                this.talkButton.setText(`Talk to ${object.name}`);
                 this.talkButton.setVisible(true);
             }else{
                 this.talkButton.setVisible(false);
@@ -305,6 +328,7 @@ class Game {
         this.quest = {};
         this.door = {};
         this.indoor = {};
+        this.npc = {};
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
         this.fetchData().then(() => {
@@ -318,14 +342,17 @@ class Game {
             const response2 = await fetch('https://data-bank-delta.vercel.app/quest');
             const response3 = await fetch('https://data-bank-delta.vercel.app/door');
             const response4 = await fetch('https://data-bank-delta.vercel.app/indoor');
+            const response5 = await fetch('https://data-bank-delta.vercel.app/npc');
             const data1 = await response1.json();
             const data2 = await response2.json();
             const data3 = await response3.json();
             const data4 = await response4.json();
+            const data5 = await response5.json();
             this.dialogue = data1;  // Store API data
             this.quest = data2;
             this.door = data3;
             this.indoor = data4;
+            this.npc = data5;
             console.log("Fetched data 1:", data1);
             console.log("Fetched data 2:", data2);
         } catch (error) {
@@ -358,6 +385,7 @@ class Game {
             quest: this.quest,
             door: this.door,
             indoor: this.indoor,
+            npc: this.npc,
         });
     }
 }

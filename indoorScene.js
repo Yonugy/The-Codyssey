@@ -29,13 +29,13 @@ export class IndoorScene extends Phaser.Scene {
     }
 
     preload() {
-        this.cameras.main.setBackgroundColor('#4F546B');
 
     }
 
     create() {
         console.log("Entered House Interior");
         let indoorDetail = this.indoor[this.sceneName];
+        this.cameras.main.setBackgroundColor(indoorDetail.bgcolor);
 
         this.backdrop['house_map'] = new Backdrop(this, 0, 0, indoorDetail.img, indoorDetail.scale);
         this.current_bg=this.backdrop['house_map'];
