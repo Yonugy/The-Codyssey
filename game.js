@@ -65,6 +65,22 @@ class MainScene extends Phaser.Scene {
                 });
             }
         }
+
+        // const connectDB = require("./mongo");
+
+        // async function fetchQuests() {
+        //     const { client, collection } = await connectDB();
+
+        //     try {
+        //         const quests = await collection.find({}).toArray(); // Fetch all documents
+        //         console.log(quests);
+        //     } finally {
+        //         await client.close(); // Close connection when done
+        //     }
+        // }
+
+        // fetchQuests();
+
     }
 
     create() {
