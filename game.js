@@ -65,22 +65,6 @@ class MainScene extends Phaser.Scene {
                 });
             }
         }
-
-        // const connectDB = require("./mongo");
-
-        // async function fetchQuests() {
-        //     const { client, collection } = await connectDB();
-
-        //     try {
-        //         const quests = await collection.find({}).toArray(); // Fetch all documents
-        //         console.log(quests);
-        //     } finally {
-        //         await client.close(); // Close connection when done
-        //     }
-        // }
-
-        // fetchQuests();
-
     }
 
     create() {
@@ -375,6 +359,21 @@ class Game {
             console.error('Error fetching data:', error);
         }
     }
+
+    fetchFaculties = async () => {
+        try {
+          const { data } = await axios.get("http://localhost:4000/npc", {
+            withCredentials: true,
+          });
+          if (data.success) {
+            setFaculties(data.faculties);
+          } else {
+            toast.error(data.message);
+          }
+        } catch (error) {
+          toast.error(error.message);
+        }
+      };
 
     startGame() {
         this.config = {
