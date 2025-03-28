@@ -7,7 +7,6 @@ const connectDB = async () => {
 
   await mongoose.connect(`${process.env.MONGODB_URI}/game`); // Use the updated .env variable
 
-//   await mongoose.connect(`mongodb+srv://codysseyAdmin:codysseyAdmin@the-codyssey.toqhcrx.mongodb.net/game`);
 };
 
 export default connectDB;
