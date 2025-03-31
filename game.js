@@ -40,14 +40,6 @@ class MainScene extends Phaser.Scene {
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
         this.load.image('house1_bg', 'asset/town_map.jpg');
-        // this.load.image('ben', 'asset/ben.jpg');
-        // this.load.image('bin', 'asset/trash_bin.png');
-        // this.load.image('apu', 'asset/apu_logo.png');
-        // this.load.image('toilet', 'asset/toilet.png');
-        // this.load.spritesheet('cat', 'asset/cat-sheet.png', {
-        //     frameWidth: 247.5,  // Adjust based on your sprite sheet
-        //     frameHeight: 247.5
-        // });
         this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
             frameWidth: 128.25,  // Adjust based on your sprite sheet
             frameHeight: 130
@@ -64,39 +56,12 @@ class MainScene extends Phaser.Scene {
                     frameWidth: npc.frameSize.width,
                     frameHeight: npc.frameSize.height
                 });
-                // for (let [key,anim] of Object.entries(npc.animation)){
-                //     this.anims.create({
-                //         key: key,
-                //         frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-                //         frameRate: anim.frameRate, // Adjust speed (frames per second)
-                //         repeat: anim.repeat // -1 = Loop infinitely
-                //     });
-                // }
             }
         }
-
-        // for (let [tag,npc] of Object.entries(this.allnpc)){
-        //     if (npc.animation){
-        //         for (let [key,anim] of Object.entries(npc.animation)){
-        //             this.anims.create({
-        //                 key: key,
-        //                 frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-        //                 frameRate: anim.frameRate, // Adjust speed (frames per second)
-        //                 repeat: anim.repeat // -1 = Loop infinitely
-        //             });
-        //         }
-        //     }
-        // }
     }
 
     create() {
         //set initial quest and subquest in the beginning
-        // this.activeQuest = this.quest.init;
-        // this.activeSubQuest = this.quest[this.activeQuest].startquest;
-        // console.log(this.activeQuest)
-        // console.log(this.activeSubQuest);
-        // console.log(this.quest[this.activeQuest].subquest[this.activeSubQuest]);
-
         //use registry to store data across all scenes
         let activeQuest = this.quest.init;
         let activeSubQuest = this.quest[activeQuest].startquest;
@@ -111,41 +76,6 @@ class MainScene extends Phaser.Scene {
 
         //import npc
         this.spawnNpc();
-        // let questNpcData = this.quest[this.activeQuest].subquest[this.activeSubQuest].npc; //list of quest data
-        // for (let [tag,npc] of Object.entries(this.allnpc)){
-        //     if (questNpcData[tag]){
-        //         let npcPos = questNpcData[tag].position; //position of the npc
-        //         this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
-        //         console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
-        //         if (npc.animation){
-        //             for (let [key,anim] of Object.entries(npc.animation)){
-        //                 this.anims.create({
-        //                     key: key,
-        //                     frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-        //                     frameRate: anim.frameRate, // Adjust speed (frames per second)
-        //                     repeat: anim.repeat // -1 = Loop infinitely
-        //                 });
-        //             }
-        //             this.npc[tag].setFrame(npc.initialFrame);
-        //         }
-        //     }
-        // }
-
-        // this.npc['bin'] = new Npc(this, 390, 400, 'bin', 0.1);
-
-        // this.npc['apu'] = new Npc(this, 670, 440, 'apu', 0.5);
-
-        // this.npc['toilet'] = new Npc(this, 980, 330, 'toilet', 0.5);
-
-        // this.anims.create({
-        //     key: 'cat_turn',
-        //     frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 93 }),
-        //     frameRate: 60, // Adjust speed (frames per second)
-        //     repeat: 1 // -1 = Loop infinitely
-        // });
-
-        // this.npc['cat'] = new Npc(this, 330, 580, 'cat', 0.7);
-        // this.npc['cat'].setFrame(0);
 
         //player (fighter)
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
@@ -180,7 +110,6 @@ class MainScene extends Phaser.Scene {
         });
 
         //house collision area (door)
-        // this.door['house1'] = new Door(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
         let doorData = this.alldoor[this.sceneName] //list of door of the current scene
         for (let door of doorData){ //dictionary contains info of a door
             if (door.to){ //not an exit (exit dont have "to")

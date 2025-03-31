@@ -10,8 +10,6 @@ export class IndoorScene extends Phaser.Scene {
         super({ key: "IndoorScene" }); // Scene key
         this.collisionHappened = false
         this.touching="";
-        // this.inventory=this.registry.get("inventory");
-        // this.fulfill=this.registry.get("fulfill");
         this.npc={};
         this.backdrop={};
         this.doors={};
@@ -20,8 +18,6 @@ export class IndoorScene extends Phaser.Scene {
         this.gameposx=140;
         this.gameposy=260;
         this.movementSpeed=200;
-        // this.activeQuest=this.registry.get("activeQuest");
-        // this.activeSubQuest=this.registry.get("activeSubQuest");
     }
 
     init(data) {
@@ -34,11 +30,6 @@ export class IndoorScene extends Phaser.Scene {
         this.indoor = data.indoorData;
         this.alldoor = data.doorData;
         this.sceneName = data.sceneName;
-        // this.gameData = data.gameData; //game data from main scene
-        // this.activeQuest = this.gameData.activeQuest; //quest name
-        // this.activeSubQuest = this.gameData.activeSubQuest; //subquest name
-        // this.inventory = this.gameData.inventory; //inventory data
-        // this.fulfill = this.gameData.fulfill; //quest criteria
     }
 
     preload() {
@@ -250,7 +241,6 @@ export class IndoorScene extends Phaser.Scene {
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
-        // this.npcList = Object.values(this.npc);
         let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
