@@ -1,5 +1,8 @@
+import { Dialog } from './dialog.js';
 import { Backdrop } from './backdrop.js';
 import { Door } from './door.js';
+import { Npc } from './npc.js';
+
 
 
 export class IndoorScene extends Phaser.Scene {
@@ -7,8 +10,8 @@ export class IndoorScene extends Phaser.Scene {
         super({ key: "IndoorScene" }); // Scene key
         this.collisionHappened = false
         this.touching="";
-        this.inventory=[];
-        this.fulfill=[]
+        // this.inventory=this.registry.get("inventory");
+        // this.fulfill=this.registry.get("fulfill");
         this.npc={};
         this.backdrop={};
         this.doors={};
@@ -17,36 +20,70 @@ export class IndoorScene extends Phaser.Scene {
         this.gameposx=140;
         this.gameposy=260;
         this.movementSpeed=200;
+        // this.activeQuest=this.registry.get("activeQuest");
+        // this.activeSubQuest=this.registry.get("activeSubQuest");
     }
 
     init(data) {
         // Receive game width & height from the constructor
         this.gameWidth = data.width;
         this.gameHeight = data.height;
+        this.dialogue = data.dialogue
+        this.quest = data.quest; //quest data from main scene
+        this.allnpc = data.npc; //all npc data from main scene
         this.indoor = data.indoorData;
         this.alldoor = data.doorData;
         this.sceneName = data.sceneName;
+        // this.gameData = data.gameData; //game data from main scene
+        // this.activeQuest = this.gameData.activeQuest; //quest name
+        // this.activeSubQuest = this.gameData.activeSubQuest; //subquest name
+        // this.inventory = this.gameData.inventory; //inventory data
+        // this.fulfill = this.gameData.fulfill; //quest criteria
     }
 
     preload() {
-        this.cameras.main.setBackgroundColor('#4F546B');
 
     }
 
     create() {
         console.log("Entered House Interior");
         let indoorDetail = this.indoor[this.sceneName];
+        this.cameras.main.setBackgroundColor(indoorDetail.bgcolor);
 
         this.backdrop['house_map'] = new Backdrop(this, 0, 0, indoorDetail.img, indoorDetail.scale);
         this.current_bg=this.backdrop['house_map'];
-        // this.current_bg = new Backdrop(this, 0, 0, this.indoorData.img, this.indoorData.scale)
+
+        //import npc
+        this.npc={};
+        let activeQuest = this.registry.get("activeQuest");
+        let activeSubQuest = this.registry.get("activeSubQuest");
+        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc; //list of quest data
+        let questLocation = this.quest[activeQuest].subquest[activeSubQuest].location; //location of the quest
+        for (let [tag,npc] of Object.entries(this.allnpc)){
+            if (questNpcData[tag] && questLocation===this.sceneName){
+                let npcPos = questNpcData[tag].position; //position of the npc
+                this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
+                console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
+                if (npc.animation){
+                    for (let [key,anim] of Object.entries(npc.animation)){
+                        if (!this.anims.exists(key)){
+                            this.anims.create({
+                                key: key,
+                                frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
+                                frameRate: anim.frameRate, // Adjust speed (frames per second)
+                                repeat: anim.repeat // -1 = Loop infinitely
+                            });
+                        }
+                    }
+                    this.npc[tag].setFrame(npc.initialFrame);
+                }
+            }
+        }
 
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
         this.player_direction=-1;
 
-        this.npcList = Object.values(this.npc);
-
-        // this.door['exit'] = new Door(this, 384, 832, 443, 895, '#000', 'Exit');
+        //house collision area (door)
         let doorData = this.alldoor[this.sceneName]
         for (let door of doorData){ //dictionary contains info of a door
             if (door.to){ //not an exit (exit dont have "to")
@@ -60,9 +97,20 @@ export class IndoorScene extends Phaser.Scene {
             }
         }
 
-        this.doorList = Object.values(this.doors);
-        this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
+        //Talk to npc button
+        this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        })
+        .setPadding(10)
+        .setInteractive() // Make the text clickable
+        .on('pointerdown', () => {
+            this.talk();
+        });
+        this.talkButton.setVisible(false);
 
+        //Enter house button
         this.enterButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Enter house', {
             fontSize: '24px',
             fill: '#ffffff',
@@ -74,6 +122,12 @@ export class IndoorScene extends Phaser.Scene {
             this.enterDoor();
         });
         this.enterButton.setVisible(false);
+
+        //Collision listener
+        this.npcList = Object.values(this.npc);
+        this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
+        this.doorList = Object.values(this.doors);
+        this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         let spawnPos = indoorDetail.spawn; //dictionary contains {x:? , y:?}
         this.setGamePos(spawnPos.x,spawnPos.y);
@@ -126,8 +180,26 @@ export class IndoorScene extends Phaser.Scene {
             this.moveMap(x, y);
         }
 
+        if (!this.physics.overlap(this.player, this.npcList)) {
+            this.talkButton.setVisible(false);
+        }
+
         if (!this.physics.overlap(this.player, this.doorList)) {
             this.enterButton.setVisible(false);
+        }
+    }
+
+    showTalk(player, object) { //update on new npc
+        if (!this.collisionHappened) {
+            this.touching=object;
+            let activeQuest = this.registry.get("activeQuest");
+            let activeSubQuest = this.registry.get("activeSubQuest");
+            if (this.dialogue[object.tag][activeSubQuest]  && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
+                this.talkButton.setText(`Talk to ${object.name}`);
+                this.talkButton.setVisible(true);
+            }else{
+                this.talkButton.setVisible(false);
+            }
         }
     }
 
@@ -143,6 +215,18 @@ export class IndoorScene extends Phaser.Scene {
             }
             this.enterButton.setVisible(true);
         }
+    }
+
+    talk() { //update on new npc
+        this.talkButton.setVisible(false);
+        this.collisionHappened = true;
+        let object = this.touching;
+        console.log(`Talking to the ${object.name}...`);
+        let activeSubQuest = this.registry.get("activeSubQuest");
+        let chats=this.dialogue[object.tag][activeSubQuest];
+        console.log(chats);
+        this.dialog1 = new Dialog(this,chats);
+        this.dialog1.showDialogs();
     }
 
     enterDoor() {
@@ -166,12 +250,14 @@ export class IndoorScene extends Phaser.Scene {
 
     moveMap(x, y) {
         //add npc or game objects into the list to follow map to move
+        // this.npcList = Object.values(this.npc);
         let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setVelocity(x, y));
     }
 
     setGamePos(x, y) {
         //add npc or game objects into the list to follow map to move
+        this.npcList = Object.values(this.npc);
         let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
         sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
