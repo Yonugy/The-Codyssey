@@ -325,6 +325,8 @@ class MainScene extends Phaser.Scene {
                 }
             }
         }
+
+        this.children.bringToTop(this.player);
     }
 
     moveMap(x, y) {
