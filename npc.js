@@ -17,10 +17,6 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         this.dialog1.showDialogs();
     }
 
-    // move(x, y) {
-    //     this.setVelocity(x, y);
-    // }
-
     setMapPos(x,y){
         let bgscale=this.game.current_bg.scale;
         let actualPosx=this.mapPosx*bgscale + this.game.gameWidth/2 - x*bgscale;
