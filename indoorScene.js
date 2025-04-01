@@ -27,7 +27,7 @@ export class IndoorScene extends Phaser.Scene {
         this.dialogue = data.dialogue
         this.quest = data.quest; //quest data from main scene
         this.allnpc = data.npc; //all npc data from main scene
-        this.indoor = data.indoorData;
+        this.location = data.location;
         this.alldoor = data.doorData;
         this.sceneName = data.sceneName;
     }
@@ -38,7 +38,7 @@ export class IndoorScene extends Phaser.Scene {
 
     create() {
         console.log("Entered House Interior");
-        let indoorDetail = this.indoor[this.sceneName];
+        let indoorDetail = this.location[this.sceneName];
         this.cameras.main.setBackgroundColor(indoorDetail.bgcolor);
 
         this.backdrop['house_map'] = new Backdrop(this, 0, 0, indoorDetail.img, indoorDetail.scale);
@@ -46,30 +46,7 @@ export class IndoorScene extends Phaser.Scene {
 
         //import npc
         this.npc={};
-        let activeQuest = this.registry.get("activeQuest");
-        let activeSubQuest = this.registry.get("activeSubQuest");
-        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc; //list of quest data
-        let questLocation = this.quest[activeQuest].subquest[activeSubQuest].location; //location of the quest
-        for (let [tag,npc] of Object.entries(this.allnpc)){
-            if (questNpcData[tag] && questLocation===this.sceneName){
-                let npcPos = questNpcData[tag].position; //position of the npc
-                this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
-                console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
-                if (npc.animation){
-                    for (let [key,anim] of Object.entries(npc.animation)){
-                        if (!this.anims.exists(key)){
-                            this.anims.create({
-                                key: key,
-                                frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-                                frameRate: anim.frameRate, // Adjust speed (frames per second)
-                                repeat: anim.repeat // -1 = Loop infinitely
-                            });
-                        }
-                    }
-                    this.npc[tag].setFrame(npc.initialFrame);
-                }
-            }
-        }
+        this.spawnNpc();
 
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
         this.player_direction=-1;
@@ -78,7 +55,7 @@ export class IndoorScene extends Phaser.Scene {
         let doorData = this.alldoor[this.sceneName]
         for (let door of doorData){ //dictionary contains info of a door
             if (door.to){ //not an exit (exit dont have "to")
-                let indoorDetail = this.indoor[door.to]; //target indoor detail
+                let indoorDetail = this.location[door.to]; //target indoor detail
                 let label = indoorDetail.label; //indoor label for action text
                 let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
                 this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
@@ -180,6 +157,42 @@ export class IndoorScene extends Phaser.Scene {
         }
     }
 
+    spawnNpc(){
+        //import npc
+        let activeQuest = this.registry.get("activeQuest");
+        let activeSubQuest = this.registry.get("activeSubQuest");
+        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc; //list of quest data
+        let locationNpcData = this.location[this.sceneName].npc; //list of location data
+        for (let [tag,npc] of Object.entries(this.allnpc)){ //loop through all npc
+            if (questNpcData[tag] || locationNpcData[tag]){
+                if (questNpcData[tag] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){ //if npc in quest data
+                    var npcPos = questNpcData[tag].position; //position of the npc
+                }else if (locationNpcData[tag]){ //if npc in location data
+                    var npcPos = locationNpcData[tag].position; //position of the npc
+                    console.log(locationNpcData[tag]);
+                }else{
+                    continue; //skip if not in quest or location data
+                }
+                this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
+                console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
+                if (npc.animation){
+                    for (let [key,anim] of Object.entries(npc.animation)){
+                        if (!this.anims.exists(key)){
+                            this.anims.create({
+                                key: key,
+                                frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
+                                frameRate: anim.frameRate, // Adjust speed (frames per second)
+                                repeat: anim.repeat // -1 = Loop infinitely
+                            });
+                        }
+                    }
+                    this.npc[tag].setFrame(npc.initialFrame);
+                }
+            }
+        }
+        this.children.bringToTop(this.player);
+    }
+
     showTalk(player, object) { //update on new npc
         if (!this.collisionHappened) {
             this.touching=object;
@@ -199,7 +212,7 @@ export class IndoorScene extends Phaser.Scene {
             this.touching=object; //door.name (Your House etc)
             let objectName = object.label;
             if (objectName=="Exit"){
-                let houseName = this.indoor[this.sceneName].label;
+                let houseName = this.location[this.sceneName].label;
                 this.enterButton.setText(`Exit ${houseName}`);
             }else{
                 this.enterButton.setText(`Enter ${objectName}`);
@@ -229,11 +242,11 @@ export class IndoorScene extends Phaser.Scene {
             this.exitHouse()
         }else{
             //go indoor
-            let indoorDetail = this.indoor[this.touching.target]; //target is "to" of a door
+            let indoorDetail = this.location[this.touching.target]; //target is "to" of a door
             this.scene.switch('IndoorScene', {
                 width: this.gameWidth,
                 height: this.gameHeight,
-                indoorData: indoorDetail,
+                location: indoorDetail,
                 sceneName: this.touching.target,
             });
         }
