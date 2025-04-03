@@ -161,8 +161,8 @@ export class IndoorScene extends Phaser.Scene {
         //import npc
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
-        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc; //list of quest data
-        let locationNpcData = this.location[this.sceneName].npc; //list of location data
+        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
+        let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
         for (let [tag,npc] of Object.entries(this.allnpc)){ //loop through all npc
             if (questNpcData[tag] || locationNpcData[tag]){
                 if (questNpcData[tag] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){ //if npc in quest data
