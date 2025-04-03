@@ -61,7 +61,8 @@ class MainScene extends Phaser.Scene {
     create() {
         //set initial quest and subquest in the beginning
         //use registry to store data across all scenes
-        let activeQuest = this.quest.init;
+        // let activeQuest = this.quest.init;
+        let activeQuest = "quest1";
         let activeSubQuest = this.quest[activeQuest].startquest;
         this.registry.set("activeQuest", activeQuest);
         this.registry.set("activeSubQuest", activeSubQuest);
