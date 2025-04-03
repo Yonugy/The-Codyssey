@@ -18,8 +18,6 @@ class MainScene extends Phaser.Scene {
         this.doors={};
         this.player_direction=-1;
         this.current_bg;
-        this.gameposx=140;
-        this.gameposy=260;
         this.movementSpeed=200;
     }
 
@@ -31,7 +29,7 @@ class MainScene extends Phaser.Scene {
         this.dialogue = data.dialogue || {};
         this.quest = data.quest || {};
         this.alldoor = data.door || {};
-        this.indoor = data.indoor || {};
+        this.location = data.location || {};
         this.allnpc = data.npc || {};
     }
 
@@ -39,15 +37,7 @@ class MainScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#E98B45');
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
-        this.load.image('house1_bg', 'asset/town_map.jpg');
-        // this.load.image('ben', 'asset/ben.jpg');
-        // this.load.image('bin', 'asset/trash_bin.png');
-        // this.load.image('apu', 'asset/apu_logo.png');
-        // this.load.image('toilet', 'asset/toilet.png');
-        // this.load.spritesheet('cat', 'asset/cat-sheet.png', {
-        //     frameWidth: 247.5,  // Adjust based on your sprite sheet
-        //     frameHeight: 247.5
-        // });
+        // this.load.image('house1_bg', 'asset/town_map.jpg');
         this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
             frameWidth: 128.25,  // Adjust based on your sprite sheet
             frameHeight: 130
@@ -64,39 +54,12 @@ class MainScene extends Phaser.Scene {
                     frameWidth: npc.frameSize.width,
                     frameHeight: npc.frameSize.height
                 });
-                // for (let [key,anim] of Object.entries(npc.animation)){
-                //     this.anims.create({
-                //         key: key,
-                //         frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-                //         frameRate: anim.frameRate, // Adjust speed (frames per second)
-                //         repeat: anim.repeat // -1 = Loop infinitely
-                //     });
-                // }
             }
         }
-
-        // for (let [tag,npc] of Object.entries(this.allnpc)){
-        //     if (npc.animation){
-        //         for (let [key,anim] of Object.entries(npc.animation)){
-        //             this.anims.create({
-        //                 key: key,
-        //                 frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-        //                 frameRate: anim.frameRate, // Adjust speed (frames per second)
-        //                 repeat: anim.repeat // -1 = Loop infinitely
-        //             });
-        //         }
-        //     }
-        // }
     }
 
     create() {
         //set initial quest and subquest in the beginning
-        // this.activeQuest = this.quest.init;
-        // this.activeSubQuest = this.quest[this.activeQuest].startquest;
-        // console.log(this.activeQuest)
-        // console.log(this.activeSubQuest);
-        // console.log(this.quest[this.activeQuest].subquest[this.activeSubQuest]);
-
         //use registry to store data across all scenes
         let activeQuest = this.quest.init;
         let activeSubQuest = this.quest[activeQuest].startquest;
@@ -111,41 +74,6 @@ class MainScene extends Phaser.Scene {
 
         //import npc
         this.spawnNpc();
-        // let questNpcData = this.quest[this.activeQuest].subquest[this.activeSubQuest].npc; //list of quest data
-        // for (let [tag,npc] of Object.entries(this.allnpc)){
-        //     if (questNpcData[tag]){
-        //         let npcPos = questNpcData[tag].position; //position of the npc
-        //         this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
-        //         console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
-        //         if (npc.animation){
-        //             for (let [key,anim] of Object.entries(npc.animation)){
-        //                 this.anims.create({
-        //                     key: key,
-        //                     frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-        //                     frameRate: anim.frameRate, // Adjust speed (frames per second)
-        //                     repeat: anim.repeat // -1 = Loop infinitely
-        //                 });
-        //             }
-        //             this.npc[tag].setFrame(npc.initialFrame);
-        //         }
-        //     }
-        // }
-
-        // this.npc['bin'] = new Npc(this, 390, 400, 'bin', 0.1);
-
-        // this.npc['apu'] = new Npc(this, 670, 440, 'apu', 0.5);
-
-        // this.npc['toilet'] = new Npc(this, 980, 330, 'toilet', 0.5);
-
-        // this.anims.create({
-        //     key: 'cat_turn',
-        //     frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 93 }),
-        //     frameRate: 60, // Adjust speed (frames per second)
-        //     repeat: 1 // -1 = Loop infinitely
-        // });
-
-        // this.npc['cat'] = new Npc(this, 330, 580, 'cat', 0.7);
-        // this.npc['cat'].setFrame(0);
 
         //player (fighter)
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
@@ -180,12 +108,11 @@ class MainScene extends Phaser.Scene {
         });
 
         //house collision area (door)
-        // this.door['house1'] = new Door(this, 369, 240, 409, 292, '#000', 'Beh House'); //add argument behind for opacity
         let doorData = this.alldoor[this.sceneName] //list of door of the current scene
         for (let door of doorData){ //dictionary contains info of a door
             if (door.to){ //not an exit (exit dont have "to")
-                let indoorDetail = this.indoor[door.to]; //target indoor detail
-                let label = indoorDetail.label; //indoor label for action text
+                let indoorDetail = this.location[door.to]; //target location detail
+                let label = indoorDetail.label; //location label for action text
                 let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
                 this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
             }
@@ -302,12 +229,17 @@ class MainScene extends Phaser.Scene {
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
         let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc; //list of quest data
-        if (this.quest[activeQuest].subquest[activeSubQuest].location != this.sceneName){
-            return;
-        }
-        for (let [tag,npc] of Object.entries(this.allnpc)){
-            if (questNpcData[tag]){
-                let npcPos = questNpcData[tag].position; //position of the npc
+        let locationNpcData = this.location[this.sceneName].npc; //list of location data
+        for (let [tag,npc] of Object.entries(this.allnpc)){ //loop through all npc
+            if (questNpcData[tag] || locationNpcData[tag]){
+                if (questNpcData[tag] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){ //if npc in quest data
+                    var npcPos = questNpcData[tag].position; //position of the npc
+                }else if (locationNpcData[tag]){ //if npc in location data
+                    var npcPos = locationNpcData[tag].position; //position of the npc
+                    console.log(locationNpcData[tag]);
+                }else{
+                    continue; //skip if not in quest or location data
+                }
                 this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
                 console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
                 if (npc.animation){
@@ -325,7 +257,6 @@ class MainScene extends Phaser.Scene {
                 }
             }
         }
-
         this.children.bringToTop(this.player);
     }
 
@@ -343,7 +274,7 @@ class MainScene extends Phaser.Scene {
         sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
-    talk() { //update on new npc
+    talk() {
         this.talkButton.setVisible(false);
         this.collisionHappened = true;
         let object = this.touching;
@@ -385,7 +316,7 @@ class MainScene extends Phaser.Scene {
             dialogue: this.dialogue,
             quest: this.quest,
             npc: this.allnpc,
-            indoorData: this.indoor,
+            location: this.location,
             doorData: this.alldoor,
             sceneName: this.touching.target,
         });
@@ -420,7 +351,7 @@ class Game {
         this.dialogue = {}; // Store dialogues from API
         this.quest = {};
         this.door = {};
-        this.indoor = {};
+        this.location = {};
         this.npc = {};
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
@@ -434,7 +365,7 @@ class Game {
             const response1 = await fetch('https://data-bank-delta.vercel.app/');
             const response2 = await fetch('https://data-bank-delta.vercel.app/quest');
             const response3 = await fetch('https://data-bank-delta.vercel.app/door');
-            const response4 = await fetch('https://data-bank-delta.vercel.app/indoor');
+            const response4 = await fetch('https://data-bank-delta.vercel.app/location');
             const response5 = await fetch('https://data-bank-delta.vercel.app/npc');
             const data1 = await response1.json();
             const data2 = await response2.json();
@@ -444,7 +375,7 @@ class Game {
             this.dialogue = data1;  // Store API data
             this.quest = data2;
             this.door = data3;
-            this.indoor = data4;
+            this.location = data4;
             this.npc = data5;
             console.log("Fetched data 1:", data1);
             console.log("Fetched data 2:", data2);
@@ -492,7 +423,7 @@ class Game {
             dialogue: this.dialogue,
             quest: this.quest,
             door: this.door,
-            indoor: this.indoor,
+            location: this.location,
             npc: this.npc,
         });
     }
