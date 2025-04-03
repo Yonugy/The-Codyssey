@@ -61,8 +61,8 @@ class MainScene extends Phaser.Scene {
     create() {
         //set initial quest and subquest in the beginning
         //use registry to store data across all scenes
-        // let activeQuest = this.quest.init;
-        let activeQuest = "quest1";
+        // let activeQuest = this.quest.init; //comment this before committing
+        let activeQuest = "quest1"; //uncomment this before committing
         let activeSubQuest = this.quest[activeQuest].startquest;
         this.registry.set("activeQuest", activeQuest);
         this.registry.set("activeSubQuest", activeSubQuest);
@@ -229,8 +229,8 @@ class MainScene extends Phaser.Scene {
         //import npc
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
-        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc; //list of quest data
-        let locationNpcData = this.location[this.sceneName].npc; //list of location data
+        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
+        let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
         for (let [tag,npc] of Object.entries(this.allnpc)){ //loop through all npc
             if (questNpcData[tag] || locationNpcData[tag]){
                 if (questNpcData[tag] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){ //if npc in quest data
