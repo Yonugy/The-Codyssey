@@ -1,4 +1,4 @@
-import PackageDetail from "../models/packageDetail.js";
+import PackageDetail from "../models/package_detail.js";
 
 export const getPackageDetails = async (req, res) => {
   try {

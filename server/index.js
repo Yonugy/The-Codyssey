@@ -43,7 +43,7 @@ app.use("/subquest", subquestRouter); // Register subquest routes
 app.use("/package", packageRouter); // Register package routes
 app.use("/choice", choiceRouter); // Register choice routes
 app.use("/quest", questRouter); // Register quest routes
-app.use("/playerProgress", playerProgressRouter); // Register playerProgress routes
+app.use("/player_progress", playerProgressRouter); // Register playerProgress routes
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

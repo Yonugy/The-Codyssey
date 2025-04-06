@@ -1,4 +1,4 @@
-import PlayerProgress from "../models/playerProgress.js";
+import PlayerProgress from "../models/player_progress.js";
 
 export const getPlayerProgresses = async (req, res) => {
   try {
