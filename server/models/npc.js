@@ -26,6 +26,6 @@ const NPCSchema = new mongoose.Schema({
   collection: "npc", // Explicitly set the collection name
 });
 
-const NPC = mongoose.model("NPC", NPCSchema);
+const Npc = mongoose.model("NPC", NPCSchema);
 
-export default NPC;
+export default Npc;

@@ -1,10 +1,10 @@
-import NPC from "../models/npc.js"; // Import the NPC model
+import Npc from "../models/npc.js";
 
-export const getNPCs = async (req, res) => {
+export const getNpcs = async (req, res) => {
   try {
-    const npcs = await NPC.find(); // Fetch all NPCs from the collection
-    res.json({ success: true, npcs });
+    const npcs = await Npc.find(); // Fetch all NPCs
+    res.json(npcs);
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.json({ message: error.message });
   }
 };

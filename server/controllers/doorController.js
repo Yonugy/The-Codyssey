@@ -3,8 +3,8 @@ import Door from "../models/door.js";
 export const getDoors = async (req, res) => {
   try {
     const doors = await Door.find(); // Fetch all doors
-    res.json({ success: true, doors });
+    res.json(doors);
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.json({ message: error.message });
   }
 };

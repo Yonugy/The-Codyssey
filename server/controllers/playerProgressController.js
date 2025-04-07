@@ -2,9 +2,9 @@ import PlayerProgress from "../models/player_progress.js";
 
 export const getPlayerProgresses = async (req, res) => {
   try {
-    const playerProgresses = await PlayerProgress.find(); // Fetch all player progresses
-    res.json({ success: true, playerProgresses });
+    const playerProgress = await PlayerProgress.find(); // Fetch all player progress
+    res.json(playerProgress);
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.json({ message: error.message });
   }
 };
