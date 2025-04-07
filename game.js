@@ -356,6 +356,7 @@ class Game {
         this.npc = {};
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
+        this.fetchMongo(); // Fetch data from MongoDB
         this.fetchData().then(() => {
             this.startGame(); // Start game only after fetching data
         });
@@ -385,20 +386,68 @@ class Game {
         }
     }
 
-    fetchFaculties = async () => {
+    fetchMongo = async () => {
         try {
-          const { data } = await axios.get("http://localhost:4000/npc", {
-            withCredentials: true,
-          });
-          if (data.success) {
-            setFaculties(data.faculties);
-          } else {
-            toast.error(data.message);
-          }
+            const urls = [
+                "http://localhost:4000/dialogue",
+                "http://localhost:4000/quest",
+                "http://localhost:4000/door",
+                "http://localhost:4000/location",
+                "http://localhost:4000/npc",
+                "http://localhost:4000/inventory",
+                "http://localhost:4000/player",
+                "http://localhost:4000/item",
+                "http://localhost:4000/action",
+                "http://localhost:4000/package_detail",
+                "http://localhost:4000/position",
+                "http://localhost:4000/subquest",
+                "http://localhost:4000/package",
+                "http://localhost:4000/choice",
+                "http://localhost:4000/player_progress"
+            ];
+
+            const responses = await Promise.all(urls.map(url => fetch(url)));
+            const [
+                dialogue, quest, door, location, npc,
+                inventory, player, item, action, packageDetail,
+                position, subquest, packageData, choice, playerProgress
+            ] = await Promise.all(responses.map(res => res.json()));
+
+            this.dialogue = dialogue;
+            this.quest = quest;
+            this.door = door;
+            this.location = location;
+            this.npc = npc;
+            this.inventory = inventory;
+            this.player = player;
+            this.item = item;
+            this.action = action;
+            this.packageDetail = packageDetail;
+            this.position = position;
+            this.subquest = subquest;
+            this.package = packageData;
+            this.choice = choice;
+            this.playerProgress = playerProgress;
+
+            console.log("Fetched dialogue:", dialogue);
+            console.log("Fetched quest:", quest);
+            console.log("Fetched door:", door);
+            console.log("Fetched location:", location);
+            console.log("Fetched npc:", npc);
+            console.log("Fetched inventory:", inventory);
+            console.log("Fetched player:", player);
+            console.log("Fetched item:", item);
+            console.log("Fetched action:", action);
+            console.log("Fetched packageDetail:", packageDetail);
+            console.log("Fetched position:", position);
+            console.log("Fetched subquest:", subquest);
+            console.log("Fetched package:", packageData);
+            console.log("Fetched choice:", choice);
+            console.log("Fetched playerProgress:", playerProgress);
         } catch (error) {
-          toast.error(error.message);
+            console.error('Error fetching data from MongoDB:', error);
         }
-      };
+    };
 
     startGame() {
         this.config = {

@@ -1,19 +1,3 @@
-// import mongoose from "mongoose";
-
-// const performanceCategorySchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//   },
-//   quantity: {
-//     type: Number,
-//     required: true,
-//   },
-// });
-
-
-// export default performanceCategoryModel;
-
 import mongoose from "mongoose";
 
 const AnimationSchema = new mongoose.Schema({
@@ -38,8 +22,10 @@ const NPCSchema = new mongoose.Schema({
     required: function () { return this.type === "spritesheet"; },
   },
   initialFrame: { type: Number, required: function () { return this.type === "spritesheet"; } },
+}, {
+  collection: "npc", // Explicitly set the collection name
 });
 
-const NPC = mongoose.model("NPC", NPCSchema);
+const Npc = mongoose.model("NPC", NPCSchema);
 
-export default NPC;
+export default Npc;

@@ -1,31 +1,10 @@
 import express from "express";
-// import {
-//   createStaff,
-//   deleteStaff,
-//   searchStaff,
-//   getStaffProfile,
-//   updateStaffRecords,
-//   assignPrivileges,
-//   getPrivilegedStaff,
-//   assignPrivilegesToMultipleStaff,
-//   saveViewableStaff,
-// } from "../controllers/staffController.js"; // Commented out as it's not used
-import { addNPC } from "../controllers/npcController.js";
-// import userAuth from "../middleware/userAuth.js";
+import { getNpcs } from "../controllers/npcController.js"; // Import getNPCs
 
-const staffRouter = express.Router();
+const npcRouter = express.Router(); // Corrected router name
 
-// Commented out unused routes
-// staffRouter.post("/create", createStaff);
-// staffRouter.delete("/delete/:id", deleteStaff);
-// staffRouter.get("/search", searchStaff);
-// staffRouter.get("/profile/:id", getStaffProfile);
-// staffRouter.put("/update/:id", updateStaffRecords);
-// staffRouter.put("/privileges/:id", assignPrivileges);
-// staffRouter.get("/privileged", getPrivilegedStaff);
-// staffRouter.put("/assign-privileges", assignPrivilegesToMultipleStaff);
-// staffRouter.put("/save-viewable-staff", saveViewableStaff);
+// Define NPC routes
+// npcRouter.post("/npc", addNPC); // Add route to create NPC
+npcRouter.get("/", getNpcs); // Corrected route to match "/npc"
 
-staffRouter.post("/npc", addNPC);
-
-export default staffRouter;
+export default npcRouter; // Corrected export
