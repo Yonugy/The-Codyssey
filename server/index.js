@@ -25,6 +25,7 @@ const corsOptions = {
   origin: ["http://127.0.0.1:5500", "https://the-codyssey.vercel.app"], // Replace with your frontend URL
   methods: 'GET,POST', // Allowed HTTP methods
 };
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
