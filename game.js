@@ -389,21 +389,21 @@ class Game {
     fetchMongo = async () => {
         try {
             const urls = [
-                "http://localhost:4000/dialogue",
-                "http://localhost:4000/quest",
-                "http://localhost:4000/door",
-                "http://localhost:4000/location",
-                "http://localhost:4000/npc",
-                "http://localhost:4000/inventory",
-                "http://localhost:4000/player",
-                "http://localhost:4000/item",
-                "http://localhost:4000/action",
-                "http://localhost:4000/package_detail",
-                "http://localhost:4000/position",
-                "http://localhost:4000/subquest",
-                "http://localhost:4000/package",
-                "http://localhost:4000/choice",
-                "http://localhost:4000/player_progress"
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/quest",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/door",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/location",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/npc",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/inventory",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/item",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/action",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/package_detail",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/position",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/subquest",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/package",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/choice",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player_progress"
             ];
 
             const responses = await Promise.all(urls.map(url => fetch(url)));
