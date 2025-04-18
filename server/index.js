@@ -1,6 +1,6 @@
 import "dotenv/config"; // Ensure dotenv is loaded first
 import express from "express";
-// import cors from "cors"; // Import cors
+import cors from "cors"; // Import cors
 
 import connectDB from "./config/mongodb.js";
 import npcRouter from "./routes/npcRoutes.js";
@@ -20,12 +20,12 @@ import questRouter from "./routes/questRoutes.js"; // Import quest routes
 import playerProgressRouter from "./routes/playerProgressRoutes.js"; // Import playerProgress routes
 
 const app = express();
-const cors = require('cors');
+// const cors = require('cors');
 const corsOptions = {
   origin: ["http://127.0.0.1:5500", "https://the-codyssey.vercel.app"], // Replace with your frontend URL
-  // origin: '*',
-  methods: 'GET,POST', // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  credentials: true // Allow credentials (cookies, authorization headers, etc.)
 };
 app.use(cors(corsOptions));
 app.use(express.json());
