@@ -20,9 +20,9 @@ import questRouter from "./routes/questRoutes.js"; // Import quest routes
 import playerProgressRouter from "./routes/playerProgressRoutes.js"; // Import playerProgress routes
 
 const app = express();
-app.use(cors()); // Enable CORS
 const corsOptions = {
-  origin: ["http://127.0.0.1:5500", "https://the-codyssey.vercel.app"], // Replace with your frontend URL
+  // origin: ["http://127.0.0.1:5500", "https://the-codyssey.vercel.app"], // Replace with your frontend URL
+  origin: '*',
   methods: 'GET,POST', // Allowed HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization']
 };

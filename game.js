@@ -388,6 +388,7 @@ class Game {
 
     fetchMongo = async () => {
         try {
+            const proxy = "https://corsproxy.io/?";
             const urls = [
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/quest",
