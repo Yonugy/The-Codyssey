@@ -16,9 +16,9 @@ class MainScene extends Phaser.Scene {
         this.npc={};
         this.backdrop={};
         this.doors={};
-        this.player_direction=-1;
         this.current_bg;
         this.movementSpeed=200;
+        this.player_direction=-1;
     }
 
     init(data) {
@@ -35,6 +35,9 @@ class MainScene extends Phaser.Scene {
 
     preload() { //update on new npc
         this.cameras.main.setBackgroundColor('#E98B45');
+        this.load.image("tileset", "asset/map_asset/Dungeon_Tileset.png");
+        this.load.tilemapTiledJSON("map", "asset/map_asset/map1.tmj");
+
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
         // this.load.image('house1_bg', 'asset/town_map.jpg');
@@ -115,7 +118,7 @@ class MainScene extends Phaser.Scene {
                 let indoorDetail = this.location[door.to]; //target location detail
                 let label = indoorDetail.label; //location label for action text
                 let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
-                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0); //create a door object
             }
         }
 
@@ -155,65 +158,72 @@ class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         //Initial position of the player
-        this.setGamePos(140,260);
+        let playerStartPosX = 140;
+        let playerStartPosY = 260;
+        let bgscale=this.current_bg.scale;
+        this.player.setPosition(playerStartPosX*bgscale,playerStartPosY*bgscale);
 
+        //detect back to mainscene from indoor scene
         this.events.on("wake", () => {
             console.log("MainScene Resumed");
             console.log(this.registry.get("activeQuest"));
             console.log(this.registry.get("activeSubQuest"));
-            if (this.npcList.length==0 ){
-                this.spawnNpc();
-                this.setGamePos(this.MapPosx,this.MapPosy);
-                console.log(this.MapPosx);
-            }
+            // if (this.npcList.length==0 ){
+            //     this.spawnNpc();
+            //     this.setGamePos(this.MapPosx,this.MapPosy);
+            //     console.log(this.MapPosx);
+            // }
         });
+
+        this.cameras.main.startFollow(this.player);
+        let scale = this.current_bg.scale;
+        this.cameras.main.setBounds(0, 0, this.current_bg.width*scale , this.current_bg.height*scale);
     }
 
     update() {
-        let x = 0, y = 0;
-
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.keys = this.input.keyboard.addKeys({
+        let cursors = this.input.keyboard.createCursorKeys();
+        let keys = this.input.keyboard.addKeys({
             W: Phaser.Input.Keyboard.KeyCodes.W,
             A: Phaser.Input.Keyboard.KeyCodes.A,
             S: Phaser.Input.Keyboard.KeyCodes.S,
             D: Phaser.Input.Keyboard.KeyCodes.D
         });
 
-        // Left movement
-        if ((this.cursors.left.isDown || this.keys.A.isDown) && this.current_bg.x<this.gameWidth/2-this.player.displayWidth/2) {
-            x = this.movementSpeed;
-            this.player_direction=1;
-        } else if ((this.cursors.right.isDown || this.keys.D.isDown) && this.current_bg.displayWidth+this.current_bg.x>this.gameWidth/2+this.player.displayWidth/2) {
-            x = -this.movementSpeed;
-            this.player_direction=-1;
-        }
-
-        // Up/down movement
-        if ((this.cursors.up.isDown || this.keys.W.isDown) && this.current_bg.y<this.gameHeight/2-this.player.displayHeight/2) {
-            y = this.movementSpeed;
-        } else if ((this.cursors.down.isDown || this.keys.S.isDown) && this.current_bg.displayHeight+this.current_bg.y>this.gameHeight/2+this.player.displayHeight/2) {
-            y = -this.movementSpeed;
-        }
+        this.player.setVelocity(0);
+        let moveX=0;
+        let moveY=0;
 
         if (this.collisionHappened) {
             this.moveMap(0,0);
         }else{
-            if (x==0 && y==0) {
-                if (this.player_direction==1) {
-                    this.player.anims.play('fighter_left_idle', true);
-                }else if (this.player_direction==-1){
-                    this.player.anims.play('fighter_right_idle', true);
-                }
-            }else{
+            if (cursors.left.isDown || keys.A.isDown) { //move left
+                moveX-=1;
+                this.player_direction=1
+            }
+            if (cursors.right.isDown || keys.D.isDown) { //move right
+                moveX+=1;
+                this.player_direction=-1
+            }
+            if (cursors.up.isDown || keys.W.isDown) { //move up
+                moveY-=1;
+            }
+            if (cursors.down.isDown || keys.S.isDown) { //move down
+                moveY+=1;
+            }
+            if (moveX!=0 || moveY!=0) {
                 if (this.player_direction==1) {
                     this.player.anims.play('fighter_left', true);
                 }else if (this.player_direction==-1){
                     this.player.anims.play('fighter_right', true);
                 }
+            }else{
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left_idle', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right_idle', true);
+                }
             }
-
-            this.moveMap(x, y);
+            this.player.setVelocity(this.movementSpeed*moveX, this.movementSpeed*moveY);
         }
 
         if (!this.physics.overlap(this.player, this.npcList)) {
@@ -295,14 +305,14 @@ class MainScene extends Phaser.Scene {
         console.log(`Entering ${objectName}...`);
 
         //remove all npcs in the current scene
-        let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
-        if (questDetail.location != this.sceneName){
-            for (let npc of Object.values(this.npc)){
-                npc.destroy();
-            }
-            this.npc={};
-            this.npcList = [];
-        }
+        // let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
+        // if (questDetail.location != this.sceneName){
+        //     for (let npc of Object.values(this.npc)){
+        //         npc.destroy();
+        //     }
+        //     this.npc={};
+        //     this.npcList = [];
+        // }
 
         //save current map position
         this.MapPosx = this.current_bg.getMapPos().x;
@@ -329,6 +339,7 @@ class MainScene extends Phaser.Scene {
             let activeQuest = this.registry.get("activeQuest");
             let activeSubQuest = this.registry.get("activeSubQuest");
             if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
+                this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
                 this.talkButton.setText(`Talk to ${object.name}`);
                 this.talkButton.setVisible(true);
             }else{
@@ -341,6 +352,7 @@ class MainScene extends Phaser.Scene {
         if (!this.collisionHappened) {
             this.touching=object; //door.name (Your House etc)
             let objectName = object.label;
+            this.enterButton.setPosition(object.x - this.enterButton.width / 2, object.y - object.height/2 - this.enterButton.height - 5);
             this.enterButton.setText(`Enter ${objectName}`);
             this.enterButton.setVisible(true);
         }
@@ -388,7 +400,6 @@ class Game {
 
     fetchMongo = async () => {
         try {
-            const proxy = "https://corsproxy.io/?";
             const urls = [
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/quest",
