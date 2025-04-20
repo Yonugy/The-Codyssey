@@ -18,12 +18,14 @@ export class Dialog{
             new Phaser.Geom.Rectangle(30, game.gameHeight - 150, game.gameWidth - 100, 140),
             Phaser.Geom.Rectangle.Contains
         );
+        this.graphics.setScrollFactor(0);
 
         this.questionBox = game.add.text(60, game.gameHeight - 130, question, {
             font: '24px Arial',
             fill: '#ffffff',
             wordWrap: { width: game.gameWidth - 120 }
         });
+        this.questionBox.setScrollFactor(0);
 
         console.log(choices.choice);
 
@@ -35,6 +37,7 @@ export class Dialog{
                     font: '20px Arial',
                     fill: '#ffffff'
                 }).setInteractive();
+                this.option.setScrollFactor(0);
 
                 this.optionBoxes.push(this.option);
 

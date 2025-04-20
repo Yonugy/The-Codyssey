@@ -493,5 +493,5 @@ class Game {
 
 
 // Create the game object with dynamic width & height
-const myGame = new Game(1500, 700);
+const myGame = new Game(1500, 650);
 
