@@ -362,11 +362,11 @@
         {
          "columns":21,
          "firstgid":1,
-         "image":"..\/..\/Rustic Indoor.png",
+         "image":"..\/..\/Rustic_Indoor.png",
          "imageheight":320,
          "imagewidth":336,
          "margin":0,
-         "name":"Dungeon6",
+         "name":"Purple",
          "spacing":0,
          "tilecount":420,
          "tileheight":16,

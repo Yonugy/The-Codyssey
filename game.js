@@ -38,12 +38,12 @@ class MainScene extends Phaser.Scene {
         this.load.image("Dungeon_Tileset", "asset/map_asset/Dungeon_Tileset.png");
         this.load.image("Big_Set", "asset/map_asset/Big_Set.png");
         this.load.image("Rustic_Indoor", "asset/map_asset/Rustic_Indoor.png");
-        this.load.tilemapTiledJSON("map1", "asset/map_asset/map1.tmj");
-        this.load.tilemapTiledJSON("map2", "asset/map_asset/map2.tmj");
-        this.load.tilemapTiledJSON("map3", "asset/map_asset/map3.tmj");
-        this.load.tilemapTiledJSON("map4", "asset/map_asset/map4.tmj");
-        this.load.tilemapTiledJSON("map5", "asset/map_asset/map5.tmj");
-        this.load.tilemapTiledJSON("map6", "asset/map_asset/map6.tmj");
+        this.load.tilemapTiledJSON("map1", "asset/map_asset/map1.tmj"); //Mbat, Dungeon_Tileset
+        this.load.tilemapTiledJSON("map2", "asset/map_asset/map2.tmj"); //House1, Big_Set
+        this.load.tilemapTiledJSON("map3", "asset/map_asset/map3.tmj"); //House2, Big_Set *got problem
+        this.load.tilemapTiledJSON("map4", "asset/map_asset/map4.tmj"); //House3, Big_Set
+        this.load.tilemapTiledJSON("map5", "asset/map_asset/map5.tmj"); //Diner, Rustic_Indoor
+        this.load.tilemapTiledJSON("map6", "asset/map_asset/map6.tmj"); //Purple, Rustic_Indoor
 
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');

@@ -18,7 +18,7 @@ export class IndoorScene extends Phaser.Scene {
         this.gameposx=140;
         this.gameposy=260;
         this.movementSpeed=200;
-        this.zoomFactor = 7;
+        this.zoomFactor = 1;
     }
 
     init(data) {
@@ -42,22 +42,41 @@ export class IndoorScene extends Phaser.Scene {
         let indoorDetail = this.location[this.sceneName];
         console.log(this.sceneName);
         this.cameras.main.setBackgroundColor(indoorDetail.bgcolor);
+        this.current_bg.scale = this.zoomFactor;
+
+        //Create player sprite
+        this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
+        this.player_direction=-1;
+        console.log(this.player.x,this.player.y);
+
+        // Set a smaller hitbox for the player
+        let hitboxWidth = 30;  // Adjust width of the hitbox
+        let hitboxHeight = 80; // Adjust height of the hitbox
+        let offsetX = 60;      // Horizontal offset
+        let offsetY = 50;      // Vertical offset
+        this.player.body.setSize(hitboxWidth, hitboxHeight).setOffset(offsetX, offsetY);
 
 
         //import tilemap
         const map = this.make.tilemap({ key: "map2" });
-        console.log(map.layers);
-        const tileset = map.addTilesetImage("House1", "Big_Set");
+        const tileset = map.addTilesetImage("House1", "Big_Set"); //Change in tmj file Line 259
         let mapLayers = map.layers;
         for (let i = 0; i < mapLayers.length; i++) {
             let eachLayer = mapLayers[i];
             let layer = map.createLayer(eachLayer.name, tileset, 0, 0);
             this.current_bg[i]=layer;
             if (eachLayer.name == "Wall") {
+                let collidableTiles = [];
+                let allProperties = map.tilesets[0].tileProperties;
+                let firstGid = map.tilesets[0].firstgid;
+                for (let key in allProperties) {
+                    if (allProperties[key].passable === false) {
+                    collidableTiles.push(firstGid + Number(key));
+                    }
+                }
                 layer.setCollision(collidableTiles);
                 this.physics.add.collider(this.player, layer);
             }
-            
         }
         // for (let eachLayer of mapLayers) {
         //     let layer = map.createLayer(eachLayer.name, tileset, 0, 0);
@@ -68,35 +87,22 @@ export class IndoorScene extends Phaser.Scene {
         // let layer3 = map.createLayer("Decoration", tileset, 0, 0);
         // this.current_bg = { layer1, layer2, layer3, scale: this.zoomFactor };
         // this.current_bg.push({scale: this.zoomFactor});
-        this.current_bg.scale = this.zoomFactor;
-        const collidableTiles = [];
-        const allProperties = map.tilesets[0].tileProperties;
-        const firstGid = map.tilesets[0].firstgid;
-        console.log(this.current_bg);
-        
-
-        for (let key in allProperties) {
-            if (allProperties[key].passable === false) {
-            collidableTiles.push(firstGid + Number(key));
-            }
-        }
+        // this.current_bg.scale = this.zoomFactor;
+        // const collidableTiles = [];
+        // const allProperties = map.tilesets[0].tileProperties;
+        // const firstGid = map.tilesets[0].firstgid;
+        // for (let key in allProperties) {
+        //     if (allProperties[key].passable === false) {
+        //     collidableTiles.push(firstGid + Number(key));
+        //     }
+        // }
 
         // Set collision for wall layer
-        layer2.setCollision(collidableTiles);
+        // layer2.setCollision(collidableTiles);
 
         //import npc
         this.npc={};
         this.spawnNpc();
-
-        this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
-        this.player_direction=-1;
-
-        // Set a smaller hitbox for the player
-        const hitboxWidth = 30;  // Adjust width of the hitbox
-        const hitboxHeight = 80; // Adjust height of the hitbox
-        const offsetX = 60;      // Horizontal offset
-        const offsetY = 50;      // Vertical offset
-        this.player.body.setSize(hitboxWidth, hitboxHeight).setOffset(offsetX, offsetY);
 
         //house collision area (door)
         let doorData = this.alldoor[this.sceneName]
@@ -108,7 +114,8 @@ export class IndoorScene extends Phaser.Scene {
                 this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0.5); //create a door object
             }else{
                 let doorPos = door.position;
-                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit", "",1);
+                // this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit", "",1);
+                this.doors[door.to] = new Door(this, 0, 0, 100, 200, '#000', "Exit", "",1);
             }
         }
 
@@ -155,7 +162,7 @@ export class IndoorScene extends Phaser.Scene {
         this.player.setScale(1/zoomFactor);
         this.cameras.main.setZoom(zoomFactor);
         this.cameras.main.startFollow(this.player);
-        this.cameras.main.setBounds(zoomFactor, 100, map.widthInPixels, map.heightInPixels);
+        // this.cameras.main.setBounds(zoomFactor, 100, map.widthInPixels, map.heightInPixels);
 
         // this.cameras.main.setBounds(0, 0, this.current_bg.width*bgscale , this.current_bg.height*bgscale);
     }

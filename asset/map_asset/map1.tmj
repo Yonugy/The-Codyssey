@@ -318,11 +318,11 @@
         {
          "columns":10,
          "firstgid":1,
-         "image":"..\/..\/2D Pixel Dungeon Asset Pack v2.0\/2D Pixel Dungeon Asset Pack\/character and tileset\/Dungeon_Tileset.png",
+         "image":"..\/..\/Dungeon_Tileset.png",
          "imageheight":160,
          "imagewidth":160,
          "margin":0,
-         "name":"Dungeon1",
+         "name":"Mbat",
          "spacing":0,
          "tilecount":100,
          "tileheight":16,

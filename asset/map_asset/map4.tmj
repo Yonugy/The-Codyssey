@@ -318,11 +318,11 @@
         {
          "columns":8,
          "firstgid":1,
-         "image":"..\/..\/4 BigSet.png",
+         "image":"..\/..\/BigSet.png",
          "imageheight":432,
          "imagewidth":128,
          "margin":0,
-         "name":"Dungeon3",
+         "name":"House3",
          "spacing":0,
          "tilecount":216,
          "tileheight":16,
