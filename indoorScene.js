@@ -14,10 +14,11 @@ export class IndoorScene extends Phaser.Scene {
         this.backdrop={};
         this.doors={};
         this.player_direction=-1;
-        this.current_bg;
+        this.current_bg={};
         this.gameposx=140;
         this.gameposy=260;
         this.movementSpeed=200;
+        this.zoomFactor = 7;
     }
 
     init(data) {
@@ -39,10 +40,49 @@ export class IndoorScene extends Phaser.Scene {
     create() {
         console.log("Entered House Interior");
         let indoorDetail = this.location[this.sceneName];
+        console.log(this.sceneName);
         this.cameras.main.setBackgroundColor(indoorDetail.bgcolor);
 
-        this.backdrop['house_map'] = new Backdrop(this, 0, 0, indoorDetail.img, indoorDetail.scale);
-        this.current_bg=this.backdrop['house_map'];
+
+        //import tilemap
+        const map = this.make.tilemap({ key: "map2" });
+        console.log(map.layers);
+        const tileset = map.addTilesetImage("House1", "Big_Set");
+        let mapLayers = map.layers;
+        for (let i = 0; i < mapLayers.length; i++) {
+            let eachLayer = mapLayers[i];
+            let layer = map.createLayer(eachLayer.name, tileset, 0, 0);
+            this.current_bg[i]=layer;
+            if (eachLayer.name == "Wall") {
+                layer.setCollision(collidableTiles);
+                this.physics.add.collider(this.player, layer);
+            }
+            
+        }
+        // for (let eachLayer of mapLayers) {
+        //     let layer = map.createLayer(eachLayer.name, tileset, 0, 0);
+        //     this.current_bg[''](layer);
+        // }
+        // let layer1 = map.createLayer("Floor", tileset, 0, 0);
+        // let layer2 = map.createLayer("Wall", tileset, 0, 0);
+        // let layer3 = map.createLayer("Decoration", tileset, 0, 0);
+        // this.current_bg = { layer1, layer2, layer3, scale: this.zoomFactor };
+        // this.current_bg.push({scale: this.zoomFactor});
+        this.current_bg.scale = this.zoomFactor;
+        const collidableTiles = [];
+        const allProperties = map.tilesets[0].tileProperties;
+        const firstGid = map.tilesets[0].firstgid;
+        console.log(this.current_bg);
+        
+
+        for (let key in allProperties) {
+            if (allProperties[key].passable === false) {
+            collidableTiles.push(firstGid + Number(key));
+            }
+        }
+
+        // Set collision for wall layer
+        layer2.setCollision(collidableTiles);
 
         //import npc
         this.npc={};
@@ -51,6 +91,13 @@ export class IndoorScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
         this.player_direction=-1;
 
+        // Set a smaller hitbox for the player
+        const hitboxWidth = 30;  // Adjust width of the hitbox
+        const hitboxHeight = 80; // Adjust height of the hitbox
+        const offsetX = 60;      // Horizontal offset
+        const offsetY = 50;      // Vertical offset
+        this.player.body.setSize(hitboxWidth, hitboxHeight).setOffset(offsetX, offsetY);
+
         //house collision area (door)
         let doorData = this.alldoor[this.sceneName]
         for (let door of doorData){ //dictionary contains info of a door
@@ -58,10 +105,10 @@ export class IndoorScene extends Phaser.Scene {
                 let indoorDetail = this.location[door.to]; //target indoor detail
                 let label = indoorDetail.label; //indoor label for action text
                 let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
-                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0.5); //create a door object
             }else{
                 let doorPos = door.position;
-                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit");
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit", "",1);
             }
         }
 
@@ -96,56 +143,71 @@ export class IndoorScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
         this.doorList = Object.values(this.doors);
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
+        // this.physics.add.collider(this.player, layer2);
 
         let spawnPos = indoorDetail.spawn; //dictionary contains {x:? , y:?}
-        this.setGamePos(spawnPos.x,spawnPos.y);
+        // let bgscale=this.current_bg.scale;
+        // this.player.setPosition(spawnPos.x*bgscale,spawnPos.y*bgscale);
+        this.player.setPosition(spawnPos.x,spawnPos.y);
+
+        let zoomFactor = this.zoomFactor;
+        this.movementSpeed = this.movementSpeed/zoomFactor; //adjust movement speed according to zoom factor
+        this.player.setScale(1/zoomFactor);
+        this.cameras.main.setZoom(zoomFactor);
+        this.cameras.main.startFollow(this.player);
+        this.cameras.main.setBounds(zoomFactor, 100, map.widthInPixels, map.heightInPixels);
+
+        // this.cameras.main.setBounds(0, 0, this.current_bg.width*bgscale , this.current_bg.height*bgscale);
     }
 
     update() {
-        let x = 0, y = 0;
-
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.keys = this.input.keyboard.addKeys({
+        let cursors = this.input.keyboard.createCursorKeys();
+        let keys = this.input.keyboard.addKeys({
             W: Phaser.Input.Keyboard.KeyCodes.W,
             A: Phaser.Input.Keyboard.KeyCodes.A,
             S: Phaser.Input.Keyboard.KeyCodes.S,
             D: Phaser.Input.Keyboard.KeyCodes.D
         });
 
-        // Left movement
-        if ((this.cursors.left.isDown || this.keys.A.isDown) && this.current_bg.x<this.gameWidth/2-this.player.displayWidth/2) {
-            x = this.movementSpeed;
-            this.player_direction=1;
-        } else if ((this.cursors.right.isDown || this.keys.D.isDown) && this.current_bg.displayWidth+this.current_bg.x>this.gameWidth/2+this.player.displayWidth/2) {
-            x = -this.movementSpeed;
-            this.player_direction=-1;
-        }
-
-        // Up/down movement
-        if ((this.cursors.up.isDown || this.keys.W.isDown) && this.current_bg.y<this.gameHeight/2-this.player.displayHeight/2) {
-            y = this.movementSpeed;
-        } else if ((this.cursors.down.isDown || this.keys.S.isDown) && this.current_bg.displayHeight+this.current_bg.y>this.gameHeight/2+this.player.displayHeight/2) {
-            y = -this.movementSpeed;
-        }
+        this.player.setVelocity(0);
+        let moveX=0;
+        let moveY=0;
 
         if (this.collisionHappened) {
-            this.moveMap(0,0);
+            if (this.player_direction==1) {
+                this.player.anims.play('fighter_left_idle', true);
+            }else if (this.player_direction==-1){
+                this.player.anims.play('fighter_right_idle', true);
+            }
         }else{
-            if (x==0 && y==0) {
-                if (this.player_direction==1) {
-                    this.player.anims.play('fighter_left_idle', true);
-                }else if (this.player_direction==-1){
-                    this.player.anims.play('fighter_right_idle', true);
-                }
-            }else{
+            if (cursors.left.isDown || keys.A.isDown) { //move left
+                moveX-=1;
+                this.player_direction=1
+            }
+            if (cursors.right.isDown || keys.D.isDown) { //move right
+                moveX+=1;
+                this.player_direction=-1
+            }
+            if (cursors.up.isDown || keys.W.isDown) { //move up
+                moveY-=1;
+            }
+            if (cursors.down.isDown || keys.S.isDown) { //move down
+                moveY+=1;
+            }
+            if (moveX!=0 || moveY!=0) {
                 if (this.player_direction==1) {
                     this.player.anims.play('fighter_left', true);
                 }else if (this.player_direction==-1){
                     this.player.anims.play('fighter_right', true);
                 }
+            }else{
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left_idle', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right_idle', true);
+                }
             }
-
-            this.moveMap(x, y);
+            this.player.setVelocity(this.movementSpeed*moveX, this.movementSpeed*moveY);
         }
 
         if (!this.physics.overlap(this.player, this.npcList)) {
@@ -169,12 +231,11 @@ export class IndoorScene extends Phaser.Scene {
                     var npcPos = questNpcData[tag].position; //position of the npc
                 }else if (locationNpcData[tag]){ //if npc in location data
                     var npcPos = locationNpcData[tag].position; //position of the npc
-                    console.log(locationNpcData[tag]);
                 }else{
                     continue; //skip if not in quest or location data
                 }
                 this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
-                console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
+                // console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
                 if (npc.animation){
                     for (let [key,anim] of Object.entries(npc.animation)){
                         if (!this.anims.exists(key)){
@@ -199,6 +260,7 @@ export class IndoorScene extends Phaser.Scene {
             let activeQuest = this.registry.get("activeQuest");
             let activeSubQuest = this.registry.get("activeSubQuest");
             if (this.dialogue[object.tag][activeSubQuest]  && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
+                this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
                 this.talkButton.setText(`Talk to ${object.name}`);
                 this.talkButton.setVisible(true);
             }else{
@@ -211,6 +273,7 @@ export class IndoorScene extends Phaser.Scene {
         if (!this.collisionHappened) {
             this.touching=object; //door.name (Your House etc)
             let objectName = object.label;
+            this.enterButton.setPosition(object.x - this.enterButton.width / 2, object.y - object.height/2 - this.enterButton.height - 5);
             if (objectName=="Exit"){
                 let houseName = this.location[this.sceneName].label;
                 this.enterButton.setText(`Exit ${houseName}`);
@@ -240,29 +303,7 @@ export class IndoorScene extends Phaser.Scene {
         if (objectName=="Exit"){
             //exit current indoor
             this.exitHouse()
-        }else{
-            //go indoor
-            let indoorDetail = this.location[this.touching.target]; //target is "to" of a door
-            this.scene.switch('IndoorScene', {
-                width: this.gameWidth,
-                height: this.gameHeight,
-                location: indoorDetail,
-                sceneName: this.touching.target,
-            });
         }
-    }
-
-    moveMap(x, y) {
-        //add npc or game objects into the list to follow map to move
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
-        sprites.forEach(sprite => sprite.setVelocity(x, y));
-    }
-
-    setGamePos(x, y) {
-        //add npc or game objects into the list to follow map to move
-        this.npcList = Object.values(this.npc);
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
-        sprites.forEach(sprite => sprite.setMapPos(x, y));
     }
 
     exitHouse() {

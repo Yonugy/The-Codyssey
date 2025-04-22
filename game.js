@@ -10,7 +10,7 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MainScene' });
         this.collisionHappened = false
-        this.touching;
+        this.touching={'door':null,'npc':null}; //in case touching door and npc at the same time
         this.inventory=[];
         this.fulfill=[]
         this.npc={};
@@ -33,14 +33,20 @@ class MainScene extends Phaser.Scene {
         this.allnpc = data.npc || {};
     }
 
-    preload() { //update on new npc
+    preload() {
         this.cameras.main.setBackgroundColor('#E98B45');
-        this.load.image("tileset", "asset/map_asset/Dungeon_Tileset.png");
-        this.load.tilemapTiledJSON("map", "asset/map_asset/map1.tmj");
+        this.load.image("Dungeon_Tileset", "asset/map_asset/Dungeon_Tileset.png");
+        this.load.image("Big_Set", "asset/map_asset/Big_Set.png");
+        this.load.image("Rustic_Indoor", "asset/map_asset/Rustic_Indoor.png");
+        this.load.tilemapTiledJSON("map1", "asset/map_asset/map1.tmj");
+        this.load.tilemapTiledJSON("map2", "asset/map_asset/map2.tmj");
+        this.load.tilemapTiledJSON("map3", "asset/map_asset/map3.tmj");
+        this.load.tilemapTiledJSON("map4", "asset/map_asset/map4.tmj");
+        this.load.tilemapTiledJSON("map5", "asset/map_asset/map5.tmj");
+        this.load.tilemapTiledJSON("map6", "asset/map_asset/map6.tmj");
 
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
-        // this.load.image('house1_bg', 'asset/town_map.jpg');
         this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
             frameWidth: 128.25,  // Adjust based on your sprite sheet
             frameHeight: 130
@@ -65,7 +71,7 @@ class MainScene extends Phaser.Scene {
         //set initial quest and subquest in the beginning
         //use registry to store data across all scenes
         // let activeQuest = this.quest.init; //comment this before committing
-        let activeQuest = "quest1"; //uncomment this before committing
+        let activeQuest = "quest3"; //uncomment this before committing
         let activeSubQuest = this.quest[activeQuest].startquest;
         this.registry.set("activeQuest", activeQuest);
         this.registry.set("activeSubQuest", activeSubQuest);
@@ -168,16 +174,16 @@ class MainScene extends Phaser.Scene {
             console.log("MainScene Resumed");
             console.log(this.registry.get("activeQuest"));
             console.log(this.registry.get("activeSubQuest"));
-            // if (this.npcList.length==0 ){
-            //     this.spawnNpc();
-            //     this.setGamePos(this.MapPosx,this.MapPosy);
-            //     console.log(this.MapPosx);
-            // }
+            if (this.npcList.length==0 ){
+                this.spawnNpc();
+                console.log(this.MapPosx);
+            }
         });
 
         this.cameras.main.startFollow(this.player);
-        let scale = this.current_bg.scale;
-        this.cameras.main.setBounds(0, 0, this.current_bg.width*scale , this.current_bg.height*scale);
+        this.cameras.main.setBounds(0, 0, this.current_bg.width*bgscale , this.current_bg.height*bgscale);
+        this.physics.world.setBounds(0, 0, this.current_bg.width * bgscale, this.current_bg.height * bgscale);
+        this.player.setCollideWorldBounds(true); // Prevent the player from moving outside the bounds
     }
 
     update() {
@@ -194,7 +200,11 @@ class MainScene extends Phaser.Scene {
         let moveY=0;
 
         if (this.collisionHappened) {
-            this.moveMap(0,0);
+            if (this.player_direction==1) {
+                this.player.anims.play('fighter_left_idle', true);
+            }else if (this.player_direction==-1){
+                this.player.anims.play('fighter_right_idle', true);
+            }
         }else{
             if (cursors.left.isDown || keys.A.isDown) { //move left
                 moveX-=1;
@@ -269,50 +279,36 @@ class MainScene extends Phaser.Scene {
             }
         }
         this.children.bringToTop(this.player);
-    }
-
-    moveMap(x, y) {
-        //add npc or game objects into the list to follow map to move
-        this.npcList = Object.values(this.npc);
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
-        sprites.forEach(sprite => sprite.setVelocity(x, y));
-    }
-
-    setGamePos(x, y) {
-        //add npc or game objects into the list to follow map to move
-        this.npcList = Object.values(this.npc);
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
-        sprites.forEach(sprite => sprite.setMapPos(x, y));
+        this.children.bringToTop(this.backdrop['town_obstacle']);
     }
 
     talk() {
         this.talkButton.setVisible(false);
         this.collisionHappened = true;
-        let object = this.touching;
+        let object = this.touching['npc'];
         console.log(`Talking to the ${object.name}...`);
         let activeSubQuest = this.registry.get("activeSubQuest");
         let chats=this.dialogue[object.tag][activeSubQuest];
-        console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
     }
 
     enterDoor() {
         this.enterButton.setVisible(false);
-        let objectName = this.touching.label;
+        let objectName = this.touching['door'].label;
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
         console.log(`Entering ${objectName}...`);
 
         //remove all npcs in the current scene
-        // let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
-        // if (questDetail.location != this.sceneName){
-        //     for (let npc of Object.values(this.npc)){
-        //         npc.destroy();
-        //     }
-        //     this.npc={};
-        //     this.npcList = [];
-        // }
+        let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
+        if (questDetail.location != this.sceneName){
+            for (let npc of Object.values(this.npc)){
+                npc.destroy();
+            }
+            this.npc={};
+            this.npcList = [];
+        }
 
         //save current map position
         this.MapPosx = this.current_bg.getMapPos().x;
@@ -329,15 +325,16 @@ class MainScene extends Phaser.Scene {
             npc: this.allnpc,
             location: this.location,
             doorData: this.alldoor,
-            sceneName: this.touching.target,
+            sceneName: this.touching['door'].target,
         });
     }
 
     showTalk(player, object) {
         if (!this.collisionHappened) {
-            this.touching=object;
+            this.touching['npc']=object;
             let activeQuest = this.registry.get("activeQuest");
             let activeSubQuest = this.registry.get("activeSubQuest");
+            this.children.bringToTop(this.talkButton);
             if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
                 this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
                 this.talkButton.setText(`Talk to ${object.name}`);
@@ -350,8 +347,9 @@ class MainScene extends Phaser.Scene {
 
     showEnter(player, object) {
         if (!this.collisionHappened) {
-            this.touching=object; //door.name (Your House etc)
+            this.touching['door']=object; //door.name (Your House etc)
             let objectName = object.label;
+            this.children.bringToTop(this.enterButton);
             this.enterButton.setPosition(object.x - this.enterButton.width / 2, object.y - object.height/2 - this.enterButton.height - 5);
             this.enterButton.setText(`Enter ${objectName}`);
             this.enterButton.setVisible(true);
