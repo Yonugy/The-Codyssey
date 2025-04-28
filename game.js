@@ -423,9 +423,7 @@ class Game {
             const urls = [
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/quest",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/door",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/location",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/npc",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/inventory",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/item",
@@ -435,21 +433,20 @@ class Game {
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/subquest",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/package",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/choice",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player_progress"
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player_progress",
+                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/admin"
             ];
 
             const responses = await Promise.all(urls.map(url => fetch(url)));
             const [
-                dialogue, quest, door, location, npc,
+                dialogue, quest, location,
                 inventory, player, item, action, packageDetail,
-                position, subquest, packageData, choice, playerProgress
+                position, subquest, packageData, choice, playerProgress, admin
             ] = await Promise.all(responses.map(res => res.json()));
 
             this.dialogue = dialogue;
             this.quest = quest;
-            this.door = door;
             this.location = location;
-            this.npc = npc;
             this.inventory = inventory;
             this.player = player;
             this.item = item;
@@ -460,10 +457,10 @@ class Game {
             this.package = packageData;
             this.choice = choice;
             this.playerProgress = playerProgress;
+            this.admin = admin;
 
             console.log("Fetched dialogue:", dialogue);
             console.log("Fetched quest:", quest);
-            console.log("Fetched door:", door);
             console.log("Fetched location:", location);
             console.log("Fetched npc:", npc);
             console.log("Fetched inventory:", inventory);
@@ -476,6 +473,7 @@ class Game {
             console.log("Fetched package:", packageData);
             console.log("Fetched choice:", choice);
             console.log("Fetched playerProgress:", playerProgress);
+            console.log("Fetched admin:", admin);
         } catch (error) {
             console.error('Error fetching data from MongoDB:', error);
         }
