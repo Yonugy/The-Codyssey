@@ -19,6 +19,7 @@ class MainScene extends Phaser.Scene {
         this.current_bg;
         this.movementSpeed=200;
         this.player_direction=-1;
+        this.zoomFactor=1.8; //1.8
     }
 
     init(data) {
@@ -71,7 +72,7 @@ class MainScene extends Phaser.Scene {
         //set initial quest and subquest in the beginning
         //use registry to store data across all scenes
         // let activeQuest = this.quest.init; //comment this before committing
-        let activeQuest = "quest3"; //uncomment this before committing
+        let activeQuest = "quest2"; //uncomment this before committing
         let activeSubQuest = this.quest[activeQuest].startquest;
         this.registry.set("activeQuest", activeQuest);
         this.registry.set("activeSubQuest", activeSubQuest);
@@ -79,7 +80,7 @@ class MainScene extends Phaser.Scene {
         this.registry.set("fulfill", this.fulfill);
 
         //import background
-        this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', 2);
+        this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', this.zoomFactor);
         this.current_bg=this.backdrop['town_map'];
 
         //import npc
@@ -129,11 +130,11 @@ class MainScene extends Phaser.Scene {
         }
 
         //background obstacle
-        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
+        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', this.zoomFactor);
 
         //Talk to npc button
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
-            fontSize: '24px',
+            fontSize: '20px',
             fill: '#ffffff',
             backgroundColor: '#000000'
         })
@@ -146,7 +147,7 @@ class MainScene extends Phaser.Scene {
 
         //Enter house button
         this.enterButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Enter house', {
-            fontSize: '24px',
+            fontSize: '20px',
             fill: '#ffffff',
             backgroundColor: '#000000'
         })
@@ -164,10 +165,9 @@ class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         //Initial position of the player
-        let playerStartPosX = 140;
-        let playerStartPosY = 260;
-        let bgscale=this.current_bg.scale;
-        this.player.setPosition(playerStartPosX*bgscale,playerStartPosY*bgscale);
+        let playerStartPosX = 140*this.zoomFactor;
+        let playerStartPosY = 260*this.zoomFactor;
+        this.player.setPosition(playerStartPosX,playerStartPosY);
 
         //detect back to mainscene from indoor scene
         this.events.on("wake", () => {
@@ -180,10 +180,14 @@ class MainScene extends Phaser.Scene {
             }
         });
 
+        let zoomFactor = this.zoomFactor
+        // this.cameras.main.setZoom(zoomFactor);
         this.cameras.main.startFollow(this.player);
-        this.cameras.main.setBounds(0, 0, this.current_bg.width*bgscale , this.current_bg.height*bgscale);
-        this.physics.world.setBounds(0, 0, this.current_bg.width * bgscale, this.current_bg.height * bgscale);
+        this.cameras.main.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
+        this.physics.world.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
         this.player.setCollideWorldBounds(true); // Prevent the player from moving outside the bounds
+        // this.player.setScale(1/zoomFactor);
+        // this.movementSpeed = this.movementSpeed/zoomFactor;
     }
 
     update() {
@@ -243,6 +247,9 @@ class MainScene extends Phaser.Scene {
         if (!this.physics.overlap(this.player, this.doorList)) {
             this.enterButton.setVisible(false);
         }
+
+        // let cam = this.cameras.main;
+        // console.log(cam.scrollX, cam.scrollY);
     }
 
     spawnNpc(){
@@ -366,10 +373,24 @@ class Game {
         this.npc = {};
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
+        console.log(window.innerWidth,window.innerHeight);
+        this.gameWidth = window.innerWidth;
+        this.gameHeight = window.innerHeight;
         this.fetchMongo(); // Fetch data from MongoDB
         this.fetchData().then(() => {
             this.startGame(); // Start game only after fetching data
         });
+    }
+
+    async fetchNpcJson() {
+        try {
+            const response = await fetch('./game-data/npc.json');
+            const npcData = await response.json();
+            this.npc = npcData;
+            console.log("Fetched NPC data:", npcData);
+        } catch (error) {
+            console.error('Error fetching npc.json:', error);
+        }
     }
 
     async fetchData() {
@@ -391,6 +412,7 @@ class Game {
             this.npc = data5;
             console.log("Fetched data 1:", data1);
             console.log("Fetched data 2:", data2);
+            await this.fetchNpcJson(); // Fetch npc.json after other data
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -491,5 +513,5 @@ class Game {
 
 
 // Create the game object with dynamic width & height
-const myGame = new Game(1500, 650);
+const myGame = new Game(1450, 650);
 

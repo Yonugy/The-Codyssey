@@ -18,7 +18,7 @@ export class IndoorScene extends Phaser.Scene {
         this.gameposx=140;
         this.gameposy=260;
         this.movementSpeed=200;
-        this.zoomFactor = 1;
+        this.zoomFactor = 7;
     }
 
     init(data) {
@@ -64,6 +64,7 @@ export class IndoorScene extends Phaser.Scene {
         for (let i = 0; i < mapLayers.length; i++) {
             let eachLayer = mapLayers[i];
             let layer = map.createLayer(eachLayer.name, tileset, 0, 0);
+            layer.setScale(this.zoomFactor);
             this.current_bg[i]=layer;
             if (eachLayer.name == "Wall") {
                 let collidableTiles = [];
@@ -158,9 +159,9 @@ export class IndoorScene extends Phaser.Scene {
         this.player.setPosition(spawnPos.x,spawnPos.y);
 
         let zoomFactor = this.zoomFactor;
-        this.movementSpeed = this.movementSpeed/zoomFactor; //adjust movement speed according to zoom factor
-        this.player.setScale(1/zoomFactor);
-        this.cameras.main.setZoom(zoomFactor);
+        // this.movementSpeed = this.movementSpeed/zoomFactor; //adjust movement speed according to zoom factor
+        // this.player.setScale(1/zoomFactor);
+        // this.cameras.main.setZoom(zoomFactor);
         this.cameras.main.startFollow(this.player);
         // this.cameras.main.setBounds(zoomFactor, 100, map.widthInPixels, map.heightInPixels);
 
