@@ -3,7 +3,6 @@ import express from "express";
 import cors from "cors"; // Import cors
 
 import connectDB from "./config/mongodb.js";
-import npcRouter from "./routes/npcRoutes.js";
 import inventoryRouter from "./routes/inventoryRoutes.js"; // Import inventory routes
 import playerRouter from "./routes/playerRoutes.js"; // Import player routes
 import locationRouter from "./routes/locationRoutes.js"; // Import location routes
@@ -36,7 +35,6 @@ console.log(PORT);
 connectDB();
 
 app.get("/", (req, res) => res.send("API Working"));
-app.use("/npc", npcRouter); // Register the NPC routes
 app.use("/inventory", inventoryRouter); // Register inventory routes
 app.use("/player", playerRouter); // Register player routes
 app.use("/location", locationRouter); // Register location routes
