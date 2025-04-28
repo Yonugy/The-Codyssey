@@ -18,6 +18,7 @@ import packageRouter from "./routes/packageRoutes.js"; // Import package routes
 import choiceRouter from "./routes/choiceRoutes.js"; // Import choice routes
 import questRouter from "./routes/questRoutes.js"; // Import quest routes
 import playerProgressRouter from "./routes/playerProgressRoutes.js"; // Import playerProgress routes
+import adminRouter from "./routes/adminRoutes.js";
 
 const app = express();
 // const cors = require('cors');
@@ -51,6 +52,7 @@ app.use("/package", packageRouter); // Register package routes
 app.use("/choice", choiceRouter); // Register choice routes
 app.use("/quest", questRouter); // Register quest routes
 app.use("/player_progress", playerProgressRouter); // Register playerProgress routes
+app.use("/admin", adminRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

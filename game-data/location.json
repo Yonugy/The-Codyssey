@@ -1,0 +1,95 @@
+[
+    {
+        "location_id": 0,
+        "type": "MainScene",
+        "spawn_position": {
+            "x": 140,
+            "y": 260
+        },
+        "entrance_position": null
+    },
+    {
+        "location_id": 1,
+        "type": "IndoorScene",
+        "spawn_position": {
+            "x": 1151,
+            "y": 1151
+        },
+        "entrance_position": {
+            "x1": 298,
+            "y1": 551,
+            "x2": 358,
+            "y2": 600
+        }
+    },
+    {
+        "location_id": 2,
+        "type": "IndoorScene",
+        "spawn_position": {
+            "x": 1056,
+            "y": 1384
+        },
+        "entrance_position": {
+            "x1": 117,
+            "y1": 234,
+            "x2": 157,
+            "y2": 286
+        }
+    },
+    {
+        "location_id": 3,
+        "type": "IndoorScene",
+        "spawn_position": {
+            "x": 1504,
+            "y": 872
+        },
+        "entrance_position": {
+            "x1": 369,
+            "y1": 240,
+            "x2": 409,
+            "y2": 292
+        }
+    },
+    {
+        "location_id": 4,
+        "type": "IndoorScene",
+        "spawn_position": {
+            "x": 888,
+            "y": 1086
+        },
+        "entrance_position": {
+            "x1": 964,
+            "y1": 299,
+            "x2": 1004,
+            "y2": 352
+        }
+    },
+    {
+        "location_id": 5,
+        "type": "IndoorScene",
+        "spawn_position": {
+            "x": 962,
+            "y": 1127
+        },
+        "entrance_position": {
+            "x1": 989,
+            "y1": 557,
+            "x2": 1048,
+            "y2": 610
+        }
+    },
+    {
+        "location_id": 6,
+        "type": "IndoorScene",
+        "spawn_position": {
+            "x": 1055,
+            "y": 2015
+        },
+        "entrance_position": {
+            "x1": 1034,
+            "y1": 125,
+            "x2": 1076,
+            "y2": 179
+        }
+    }
+]

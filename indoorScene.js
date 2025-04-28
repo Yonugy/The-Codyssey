@@ -19,6 +19,7 @@ export class IndoorScene extends Phaser.Scene {
         this.gameposy=260;
         this.movementSpeed=200;
         this.zoomFactor = 7;
+        this.fetchLocationData();
     }
 
     init(data) {
@@ -40,6 +41,7 @@ export class IndoorScene extends Phaser.Scene {
     create() {
         console.log("Entered House Interior");
         let indoorDetail = this.location[this.sceneName];
+        // let indoorDetail = this.locationDetail[0];
         console.log(this.sceneName);
         this.cameras.main.setBackgroundColor(indoorDetail.bgcolor);
         this.current_bg.scale = this.zoomFactor;
@@ -115,10 +117,15 @@ export class IndoorScene extends Phaser.Scene {
                 this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0.5); //create a door object
             }else{
                 let doorPos = door.position;
-                // this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit", "",1);
-                this.doors[door.to] = new Door(this, 0, 0, 100, 200, '#000', "Exit", "",1);
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit", "",1);
+                // this.doors[door.to] = new Door(this, 0, 0, 100, 200, '#000', "Exit", "",1);
             }
         }
+
+        // let doorPos = 
+        // this.door = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', "Exit", "",1);
+        console.log(this.allLocation);
+        console.log(this.locationDetail);
 
         //Talk to npc button
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
@@ -318,5 +325,18 @@ export class IndoorScene extends Phaser.Scene {
         console.log("Exiting house...");
         this.scene.switch("MainScene");
         this.scene.stop("IndoorScene");
+    }
+
+    async fetchLocationData() {
+        try {
+            const response1 = await fetch('./game-data/location.json');
+            const response2 = await fetch('./game-data/location_detail.json');
+            const locationData = await response1.json();
+            const locationDetailData = await response2.json();
+            this.allLocation = locationData;
+            this.locationDetail = locationDetailData;
+        } catch (error) {
+            console.error('Error fetching npc.json:', error);
+        }
     }
 }
