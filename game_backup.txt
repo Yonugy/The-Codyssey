@@ -35,9 +35,6 @@ class MainScene extends Phaser.Scene {
 
     preload() { //update on new npc
         this.cameras.main.setBackgroundColor('#E98B45');
-        this.load.image("tileset", "asset/map_asset/Dungeon_Tileset.png");
-        this.load.tilemapTiledJSON("map", "asset/map_asset/map1.tmj");
-
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
         // this.load.image('house1_bg', 'asset/town_map.jpg');
@@ -202,38 +199,22 @@ class MainScene extends Phaser.Scene {
         if (this.collisionHappened) {
             this.moveMap(0,0);
         }else{
-            if (cursors.left.isDown) {
-                this.player.setVelocityX(-speed);
-            } else if (cursors.right.isDown) {
-                player.setVelocityX(speed);
+            if (x==0 && y==0) {
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left_idle', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right_idle', true);
+                }
+            }else{
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right', true);
+                }
             }
-            
-            if (cursors.up.isDown) {
-                this.player.setVelocityY(-speed);
-            } else if (cursors.down.isDown) {
-                this.player.setVelocityY(speed);
-            }
-        }
 
-        // if (this.collisionHappened) {
-        //     this.moveMap(0,0);
-        // }else{
-        //     if (x==0 && y==0) {
-        //         if (this.player_direction==1) {
-        //             this.player.anims.play('fighter_left_idle', true);
-        //         }else if (this.player_direction==-1){
-        //             this.player.anims.play('fighter_right_idle', true);
-        //         }
-        //     }else{
-        //         if (this.player_direction==1) {
-        //             this.player.anims.play('fighter_left', true);
-        //         }else if (this.player_direction==-1){
-        //             this.player.anims.play('fighter_right', true);
-        //         }
-        //     }
-        //     player.setVelocity(x,y);
-        //     this.moveMap(x, y);
-        // }
+            this.moveMap(x, y);
+        }
 
         if (!this.physics.overlap(this.player, this.npcList)) {
             this.talkButton.setVisible(false);
@@ -405,7 +386,7 @@ class Game {
         }
     }
 
-    fetchMongo = async () => {
+    async fetchMongo() {
         try {
             const urls = [
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",

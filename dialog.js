@@ -3,38 +3,85 @@ export class Dialog{
         this.game=game;
         this.content=content;
         this.captions=Object.keys(content);
+        // this.uiCamera = this.game.cameras.add(0, 0, game.gameWidth, game.gameHeight).setScroll(0, 0).setZoom(1).setName('uiCamera');
+        this.dialogContainer = this.game.add.container(30, game.gameHeight - 150).setScrollFactor(0).setDepth(1000); // High depth to ensure it's on top
     }
 
     updateDialog(question, choices){
+        console.log(question);
         this.fulfill=this.game.registry.get("fulfill");
         this.inventory=this.game.registry.get("inventory");
         this.optionBoxes=[]
 
         let game=this.game;
+        let zoomFactor=game.zoomFactor;
+        let cam = game.cameras.main;
+        console.log(cam.scrollX, cam.scrollY);
+        // // console.log(this.game.current_bg.x, this.game.current_bg.y);
+        // // let dialogX = cam.scrollX + 30 / zoomFactor;
+        // // let dialogY = cam.scrollY + (cam.height - 150) / zoomFactor;
+        let dialogX = cam.scrollX+(30);
+        let dialogY = cam.scrollY+(game.gameHeight - 150);
+        let dialogWidth = (game.gameWidth - 100);
+        let dialogHeight = 140;
         this.graphics = game.add.graphics();
         this.graphics.fillStyle(0x000000, 0.7);
-        this.graphics.fillRoundedRect(30, game.gameHeight - 150, game.gameWidth - 100, 140, 20);
+        this.graphics.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 20);
         this.graphics.setInteractive(
-            new Phaser.Geom.Rectangle(30, game.gameHeight - 150, game.gameWidth - 100, 140),
+            new Phaser.Geom.Rectangle(dialogX, dialogY, dialogWidth, dialogHeight),
             Phaser.Geom.Rectangle.Contains
         );
+
+        // this.graphics.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 20 / zoomFactor);
+        // this.graphics.setInteractive(
+        //     new Phaser.Geom.Rectangle(dialogX, dialogY, dialogWidth, dialogHeight),
+        //     Phaser.Geom.Rectangle.Contains
+        // );
+        
+        // // this.graphics.setScale(1/zoomFactor);
+        // this.graphics.setScrollFactor(0);
+        // // this.graphics.setPosition(dialogX, dialogY);
+        // console.log(this.graphics);
+
+        // let dialogX = 0; // Relative to the container
+        // let dialogY = 0; // Relative to the container
+        // let dialogWidth = game.gameWidth - 60;
+        // let dialogHeight = 140;
+        // let borderRadius = 20;
+
+        // this.dialogContainer.removeAll(true);
+
+        // this.graphics = game.add.graphics();
+        // this.graphics.fillStyle(0x000000, 0.7);
+        // this.graphics.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, borderRadius);
+        // this.dialogContainer.add(this.graphics);
+
+        // this.questionBox = game.add.text(30, 20, question, { // relative inside container
+        //     font: '24px Arial',
+        //     fill: '#ffffff',
+        //     wordWrap: { width: dialogWidth - 60 }
+        // });
 
         this.questionBox = game.add.text(60, game.gameHeight - 130, question, {
             font: '24px Arial',
             fill: '#ffffff',
             wordWrap: { width: game.gameWidth - 120 }
         });
-
-        console.log(choices.choice);
+        this.questionBox.setScrollFactor(0);
+        // this.dialogContainer.add(this.questionBox);
 
         if (choices.choice){
             let i=0;
             //choice: option text; value: respond text
             for (let [choice, value] of Object.entries(choices.choice)){
-                this.option = game.add.text(60, game.gameHeight - (90-35*i), `Option ${i+1}: ${choice}`, {
+                let optionX = 60 + cam.scrollX;
+                let optionY = game.gameHeight - (90-35*i) + cam.scrollY;
+                this.option = game.add.text(optionX, optionY, `Option ${i+1}: ${choice}`, {
                     font: '20px Arial',
                     fill: '#ffffff'
                 }).setInteractive();
+                // this.option.setScrollFactor(0);
+                // this.dialogContainer.add(option);
 
                 this.optionBoxes.push(this.option);
 
@@ -69,8 +116,10 @@ export class Dialog{
             }
         }else{
             if (choices.animation){
-                this.game.npc[this.game.touching.tag].play(choices.animation);
+                let npc = this.game.touching.npc;
+                this.game.npc[npc.tag].play(choices.animation);
             }
+            this.graphics.setInteractive(new Phaser.Geom.Rectangle(dialogX, dialogY, dialogWidth, dialogHeight), Phaser.Geom.Rectangle.Contains);
 
             this.graphics.on('pointerdown', () => {
                 if (choices.fulfill){
@@ -89,6 +138,7 @@ export class Dialog{
                 }
             });
         }
+        // this.uiCamera.add(this.dialogContainer);
     }
 
     checkCriteria(){
@@ -119,16 +169,34 @@ export class Dialog{
 }
 
     showDialogs(){
-        let game = this.game;
         this.count=0;
         let question=this.captions[this.count];
         this.updateDialog(question, this.content[question]);
     }
 
+    // destroyDialog() {
+    //     this.graphics.destroy();
+    //     this.questionBox.destroy();
+    //     this.optionBoxes.forEach(box => box.destroy());
+    //     this.optionBoxes = [];
+    // }
+
     destroyDialog() {
-        this.graphics.destroy();
-        this.questionBox.destroy();
+        if (this.graphics) {
+            this.graphics.destroy();
+            this.graphics = null;
+        }
+        if (this.questionBox) {
+            this.questionBox.destroy();
+            this.questionBox = null;
+        }
         this.optionBoxes.forEach(box => box.destroy());
         this.optionBoxes = [];
+        // if (this.dialogContainer.exists) {
+        //     this.dialogContainer.removeAll(true);
+        //     // this.uiCamera.remove(this.dialogContainer);
+        //     // this.dialogContainer.destroy();
+        //     // this.dialogContainer = this.game.add.container(30, this.game.config.height - 150).setScrollFactor(0).setDepth(1000);
+        // }
     }
 }

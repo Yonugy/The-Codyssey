@@ -1,0 +1,50 @@
+{
+    "0":{
+        "label": "Town",
+        "bgcolor": "#E98B45",
+        "img": "town_bg",
+        "scale":1.8
+    },
+    "1":{
+        "label": "MBAT",
+        "bgcolor": "#4F546B",
+        "map": "map1",
+        "name": "Mbat",
+        "tileset": "Big_Set"
+    },
+    "2":{
+        "label": "Realm 1",
+        "bgcolor": "#3B2821",
+        "map": "map2",
+        "name": "House1",
+        "tileset": "Big_Set"
+    },
+    "3":{
+        "label": "Realm 2",
+        "bgcolor": "#3B2821",
+        "map": "map3",
+        "name": "House2",
+        "tileset": "Big_Set"
+    },
+    "4":{
+        "label": "Realm 3",
+        "bgcolor": "#3B2821",
+        "map": "map4",
+        "name": "House3",
+        "tileset": "Big_Set"
+    },
+    "5":{
+        "label": "Diner",
+        "bgcolor": "#3B2821",
+        "map": "map5",
+        "name": "Diner",
+        "tileset": "Rustic_Indoor"
+    },
+    "6":{
+        "label": "Mysterious House",
+        "bgcolor": "#3B2821",
+        "map": "map6",
+        "name": "Purple",
+        "tileset": "Rustic_Indoor"
+    }
+}

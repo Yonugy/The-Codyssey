@@ -10,15 +10,16 @@ class MainScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MainScene' });
         this.collisionHappened = false
-        this.touching;
+        this.touching={'door':null,'npc':null}; //in case touching door and npc at the same time
         this.inventory=[];
         this.fulfill=[]
         this.npc={};
         this.backdrop={};
         this.doors={};
-        this.player_direction=-1;
         this.current_bg;
         this.movementSpeed=200;
+        this.player_direction=-1;
+        this.zoomFactor=1.8; //1.8
     }
 
     init(data) {
@@ -33,11 +34,20 @@ class MainScene extends Phaser.Scene {
         this.allnpc = data.npc || {};
     }
 
-    preload() { //update on new npc
+    preload() {
         this.cameras.main.setBackgroundColor('#E98B45');
+        this.load.image("Dungeon_Tileset", "asset/map_asset/Dungeon_Tileset.png");
+        this.load.image("Big_Set", "asset/map_asset/Big_Set.png");
+        this.load.image("Rustic_Indoor", "asset/map_asset/Rustic_Indoor.png");
+        this.load.tilemapTiledJSON("map1", "asset/map_asset/map1.tmj"); //Mbat, Dungeon_Tileset
+        this.load.tilemapTiledJSON("map2", "asset/map_asset/map2.tmj"); //House1, Big_Set
+        this.load.tilemapTiledJSON("map3", "asset/map_asset/map3.tmj"); //House2, Big_Set
+        this.load.tilemapTiledJSON("map4", "asset/map_asset/map4.tmj"); //House3, Big_Set
+        this.load.tilemapTiledJSON("map5", "asset/map_asset/map5.tmj"); //Diner, Rustic_Indoor
+        this.load.tilemapTiledJSON("map6", "asset/map_asset/map6.tmj"); //Purple, Rustic_Indoor
+
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
-        // this.load.image('house1_bg', 'asset/town_map.jpg');
         this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
             frameWidth: 128.25,  // Adjust based on your sprite sheet
             frameHeight: 130
@@ -62,7 +72,7 @@ class MainScene extends Phaser.Scene {
         //set initial quest and subquest in the beginning
         //use registry to store data across all scenes
         // let activeQuest = this.quest.init; //comment this before committing
-        let activeQuest = "quest1"; //uncomment this before committing
+        let activeQuest = "quest2"; //uncomment this before committing
         let activeSubQuest = this.quest[activeQuest].startquest;
         this.registry.set("activeQuest", activeQuest);
         this.registry.set("activeSubQuest", activeSubQuest);
@@ -70,7 +80,7 @@ class MainScene extends Phaser.Scene {
         this.registry.set("fulfill", this.fulfill);
 
         //import background
-        this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', 2);
+        this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', this.zoomFactor);
         this.current_bg=this.backdrop['town_map'];
 
         //import npc
@@ -115,16 +125,16 @@ class MainScene extends Phaser.Scene {
                 let indoorDetail = this.location[door.to]; //target location detail
                 let label = indoorDetail.label; //location label for action text
                 let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
-                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to); //create a door object
+                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0); //create a door object
             }
         }
 
         //background obstacle
-        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', 2);
+        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', this.zoomFactor);
 
         //Talk to npc button
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
-            fontSize: '24px',
+            fontSize: '20px',
             fill: '#ffffff',
             backgroundColor: '#000000'
         })
@@ -137,7 +147,7 @@ class MainScene extends Phaser.Scene {
 
         //Enter house button
         this.enterButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Enter house', {
-            fontSize: '24px',
+            fontSize: '20px',
             fill: '#ffffff',
             backgroundColor: '#000000'
         })
@@ -155,65 +165,79 @@ class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         //Initial position of the player
-        this.setGamePos(140,260);
+        let playerStartPosX = 140*this.zoomFactor;
+        let playerStartPosY = 260*this.zoomFactor;
+        this.player.setPosition(playerStartPosX,playerStartPosY);
 
+        //detect back to mainscene from indoor scene
         this.events.on("wake", () => {
             console.log("MainScene Resumed");
             console.log(this.registry.get("activeQuest"));
             console.log(this.registry.get("activeSubQuest"));
             if (this.npcList.length==0 ){
                 this.spawnNpc();
-                this.setGamePos(this.MapPosx,this.MapPosy);
                 console.log(this.MapPosx);
             }
         });
+
+        let zoomFactor = this.zoomFactor
+        // this.cameras.main.setZoom(zoomFactor);
+        this.cameras.main.startFollow(this.player);
+        this.cameras.main.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
+        this.physics.world.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
+        this.player.setCollideWorldBounds(true); // Prevent the player from moving outside the bounds
+        // this.player.setScale(1/zoomFactor);
+        // this.movementSpeed = this.movementSpeed/zoomFactor;
     }
 
     update() {
-        let x = 0, y = 0;
-
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.keys = this.input.keyboard.addKeys({
+        let cursors = this.input.keyboard.createCursorKeys();
+        let keys = this.input.keyboard.addKeys({
             W: Phaser.Input.Keyboard.KeyCodes.W,
             A: Phaser.Input.Keyboard.KeyCodes.A,
             S: Phaser.Input.Keyboard.KeyCodes.S,
             D: Phaser.Input.Keyboard.KeyCodes.D
         });
 
-        // Left movement
-        if ((this.cursors.left.isDown || this.keys.A.isDown) && this.current_bg.x<this.gameWidth/2-this.player.displayWidth/2) {
-            x = this.movementSpeed;
-            this.player_direction=1;
-        } else if ((this.cursors.right.isDown || this.keys.D.isDown) && this.current_bg.displayWidth+this.current_bg.x>this.gameWidth/2+this.player.displayWidth/2) {
-            x = -this.movementSpeed;
-            this.player_direction=-1;
-        }
-
-        // Up/down movement
-        if ((this.cursors.up.isDown || this.keys.W.isDown) && this.current_bg.y<this.gameHeight/2-this.player.displayHeight/2) {
-            y = this.movementSpeed;
-        } else if ((this.cursors.down.isDown || this.keys.S.isDown) && this.current_bg.displayHeight+this.current_bg.y>this.gameHeight/2+this.player.displayHeight/2) {
-            y = -this.movementSpeed;
-        }
+        this.player.setVelocity(0);
+        let moveX=0;
+        let moveY=0;
 
         if (this.collisionHappened) {
-            this.moveMap(0,0);
+            if (this.player_direction==1) {
+                this.player.anims.play('fighter_left_idle', true);
+            }else if (this.player_direction==-1){
+                this.player.anims.play('fighter_right_idle', true);
+            }
         }else{
-            if (x==0 && y==0) {
-                if (this.player_direction==1) {
-                    this.player.anims.play('fighter_left_idle', true);
-                }else if (this.player_direction==-1){
-                    this.player.anims.play('fighter_right_idle', true);
-                }
-            }else{
+            if (cursors.left.isDown || keys.A.isDown) { //move left
+                moveX-=1;
+                this.player_direction=1
+            }
+            if (cursors.right.isDown || keys.D.isDown) { //move right
+                moveX+=1;
+                this.player_direction=-1
+            }
+            if (cursors.up.isDown || keys.W.isDown) { //move up
+                moveY-=1;
+            }
+            if (cursors.down.isDown || keys.S.isDown) { //move down
+                moveY+=1;
+            }
+            if (moveX!=0 || moveY!=0) {
                 if (this.player_direction==1) {
                     this.player.anims.play('fighter_left', true);
                 }else if (this.player_direction==-1){
                     this.player.anims.play('fighter_right', true);
                 }
+            }else{
+                if (this.player_direction==1) {
+                    this.player.anims.play('fighter_left_idle', true);
+                }else if (this.player_direction==-1){
+                    this.player.anims.play('fighter_right_idle', true);
+                }
             }
-
-            this.moveMap(x, y);
+            this.player.setVelocity(this.movementSpeed*moveX, this.movementSpeed*moveY);
         }
 
         if (!this.physics.overlap(this.player, this.npcList)) {
@@ -223,6 +247,9 @@ class MainScene extends Phaser.Scene {
         if (!this.physics.overlap(this.player, this.doorList)) {
             this.enterButton.setVisible(false);
         }
+
+        // let cam = this.cameras.main;
+        // console.log(cam.scrollX, cam.scrollY);
     }
 
     spawnNpc(){
@@ -259,37 +286,23 @@ class MainScene extends Phaser.Scene {
             }
         }
         this.children.bringToTop(this.player);
-    }
-
-    moveMap(x, y) {
-        //add npc or game objects into the list to follow map to move
-        this.npcList = Object.values(this.npc);
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
-        sprites.forEach(sprite => sprite.setVelocity(x, y));
-    }
-
-    setGamePos(x, y) {
-        //add npc or game objects into the list to follow map to move
-        this.npcList = Object.values(this.npc);
-        let sprites=this.npcList.concat(Object.values(this.backdrop)).concat(Object.values(this.doors));
-        sprites.forEach(sprite => sprite.setMapPos(x, y));
+        this.children.bringToTop(this.backdrop['town_obstacle']);
     }
 
     talk() {
         this.talkButton.setVisible(false);
         this.collisionHappened = true;
-        let object = this.touching;
+        let object = this.touching['npc'];
         console.log(`Talking to the ${object.name}...`);
         let activeSubQuest = this.registry.get("activeSubQuest");
         let chats=this.dialogue[object.tag][activeSubQuest];
-        console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
     }
 
     enterDoor() {
         this.enterButton.setVisible(false);
-        let objectName = this.touching.label;
+        let objectName = this.touching['door'].label;
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
         console.log(`Entering ${objectName}...`);
@@ -319,16 +332,18 @@ class MainScene extends Phaser.Scene {
             npc: this.allnpc,
             location: this.location,
             doorData: this.alldoor,
-            sceneName: this.touching.target,
+            sceneName: this.touching['door'].target,
         });
     }
 
     showTalk(player, object) {
         if (!this.collisionHappened) {
-            this.touching=object;
+            this.touching['npc']=object;
             let activeQuest = this.registry.get("activeQuest");
             let activeSubQuest = this.registry.get("activeSubQuest");
+            this.children.bringToTop(this.talkButton);
             if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
+                this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
                 this.talkButton.setText(`Talk to ${object.name}`);
                 this.talkButton.setVisible(true);
             }else{
@@ -339,8 +354,10 @@ class MainScene extends Phaser.Scene {
 
     showEnter(player, object) {
         if (!this.collisionHappened) {
-            this.touching=object; //door.name (Your House etc)
+            this.touching['door']=object; //door.name (Your House etc)
             let objectName = object.label;
+            this.children.bringToTop(this.enterButton);
+            this.enterButton.setPosition(object.x - this.enterButton.width / 2, object.y - object.height/2 - this.enterButton.height - 5);
             this.enterButton.setText(`Enter ${objectName}`);
             this.enterButton.setVisible(true);
         }
@@ -356,10 +373,24 @@ class Game {
         this.npc = {};
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
+        console.log(window.innerWidth,window.innerHeight);
+        this.gameWidth = window.innerWidth;
+        this.gameHeight = window.innerHeight;
         this.fetchMongo(); // Fetch data from MongoDB
         this.fetchData().then(() => {
             this.startGame(); // Start game only after fetching data
         });
+    }
+
+    async fetchNpcJson() {
+        try {
+            const response = await fetch('./game-data/npc.json');
+            const npcData = await response.json();
+            this.npc = npcData;
+            console.log("Fetched NPC data:", npcData);
+        } catch (error) {
+            console.error('Error fetching npc.json:', error);
+        }
     }
 
     async fetchData() {
@@ -381,6 +412,7 @@ class Game {
             this.npc = data5;
             console.log("Fetched data 1:", data1);
             console.log("Fetched data 2:", data2);
+            await this.fetchNpcJson(); // Fetch npc.json after other data
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -388,7 +420,6 @@ class Game {
 
     fetchMongo = async () => {
         try {
-            const proxy = "https://corsproxy.io/?";
             const urls = [
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",
                 "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/quest",
@@ -482,5 +513,5 @@ class Game {
 
 
 // Create the game object with dynamic width & height
-const myGame = new Game(1500, 700);
+const myGame = new Game(1450, 650);
 

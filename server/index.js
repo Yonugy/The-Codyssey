@@ -7,7 +7,6 @@ import npcRouter from "./routes/npcRoutes.js";
 import inventoryRouter from "./routes/inventoryRoutes.js"; // Import inventory routes
 import playerRouter from "./routes/playerRoutes.js"; // Import player routes
 import locationRouter from "./routes/locationRoutes.js"; // Import location routes
-import doorRouter from "./routes/doorRoutes.js"; // Import door routes
 import itemRouter from "./routes/itemRoutes.js"; // Import item routes
 import actionRouter from "./routes/actionRoutes.js"; // Import action routes
 import packageDetailRouter from "./routes/packageDetailRoutes.js"; // Import package_detail routes
@@ -18,6 +17,7 @@ import packageRouter from "./routes/packageRoutes.js"; // Import package routes
 import choiceRouter from "./routes/choiceRoutes.js"; // Import choice routes
 import questRouter from "./routes/questRoutes.js"; // Import quest routes
 import playerProgressRouter from "./routes/playerProgressRoutes.js"; // Import playerProgress routes
+import adminRouter from "./routes/adminRoutes.js";
 
 const app = express();
 // const cors = require('cors');
@@ -40,7 +40,6 @@ app.use("/npc", npcRouter); // Register the NPC routes
 app.use("/inventory", inventoryRouter); // Register inventory routes
 app.use("/player", playerRouter); // Register player routes
 app.use("/location", locationRouter); // Register location routes
-app.use("/door", doorRouter); // Register door routes
 app.use("/item", itemRouter); // Register item routes
 app.use("/action", actionRouter); // Register action routes
 app.use("/package_detail", packageDetailRouter); // Register package_detail routes
@@ -51,6 +50,7 @@ app.use("/package", packageRouter); // Register package routes
 app.use("/choice", choiceRouter); // Register choice routes
 app.use("/quest", questRouter); // Register quest routes
 app.use("/player_progress", playerProgressRouter); // Register playerProgress routes
+app.use("/admin", adminRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

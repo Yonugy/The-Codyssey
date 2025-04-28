@@ -3,13 +3,18 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         super(game, 0, 0, tag);
         game.add.existing(this);
         game.physics.add.existing(this);
-        this.setScale(scale);
+        let bgscale=game.current_bg.scale;
+        this.setScale(scale*bgscale);
         this.game = game;
         this.mapPosx=x;
         this.mapPosy=y;
-        this.setMapPos(x,y);
+        // this.setMapPos(x,y);
         this.tag=tag;
         this.name=name;
+        
+        let actualPosx=this.mapPosx*bgscale;
+        let actualPosy=this.mapPosy*bgscale;
+        this.setPosition(actualPosx,actualPosy);
     }
 
     talk(chats) {
@@ -18,9 +23,14 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
     }
 
     setMapPos(x,y){
+        // let bgscale=this.game.current_bg.scale;
+        // let actualPosx=this.mapPosx*bgscale + this.game.gameWidth/2 - x*bgscale;
+        // let actualPosy=this.mapPosy*bgscale + this.game.gameHeight/2 - y*bgscale;
+        // this.setPosition(actualPosx,actualPosy);
+
         let bgscale=this.game.current_bg.scale;
-        let actualPosx=this.mapPosx*bgscale + this.game.gameWidth/2 - x*bgscale;
-        let actualPosy=this.mapPosy*bgscale + this.game.gameHeight/2 - y*bgscale;
+        let actualPosx=this.mapPosx*bgscale;
+        let actualPosy=this.mapPosy*bgscale;
         this.setPosition(actualPosx,actualPosy);
     }
 }
