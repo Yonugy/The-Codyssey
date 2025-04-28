@@ -7,7 +7,6 @@ import npcRouter from "./routes/npcRoutes.js";
 import inventoryRouter from "./routes/inventoryRoutes.js"; // Import inventory routes
 import playerRouter from "./routes/playerRoutes.js"; // Import player routes
 import locationRouter from "./routes/locationRoutes.js"; // Import location routes
-import doorRouter from "./routes/doorRoutes.js"; // Import door routes
 import itemRouter from "./routes/itemRoutes.js"; // Import item routes
 import actionRouter from "./routes/actionRoutes.js"; // Import action routes
 import packageDetailRouter from "./routes/packageDetailRoutes.js"; // Import package_detail routes
@@ -41,7 +40,6 @@ app.use("/npc", npcRouter); // Register the NPC routes
 app.use("/inventory", inventoryRouter); // Register inventory routes
 app.use("/player", playerRouter); // Register player routes
 app.use("/location", locationRouter); // Register location routes
-app.use("/door", doorRouter); // Register door routes
 app.use("/item", itemRouter); // Register item routes
 app.use("/action", actionRouter); // Register action routes
 app.use("/package_detail", packageDetailRouter); // Register package_detail routes
