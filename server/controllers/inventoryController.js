@@ -46,6 +46,7 @@ export const updateOrAddInventory = async (req, res) => {
       { $inc: { amount: incrementValue } }, // Increment operation
       { upsert: true } // Insert a new record if no match is found
     );
+    console.log(player_id, item_id, amount);
 
   } catch (error) {
     console.error("Error updating or adding inventory:", error);
