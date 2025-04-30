@@ -1,0 +1,12 @@
+[
+    {
+        "position_id": 1,
+        "location_id": 0,
+        "subquest_id": 1,
+        "npc": "grand_compiler",
+        "coordinates": {
+            "x": 672,
+            "y": 100
+        }
+    }
+]

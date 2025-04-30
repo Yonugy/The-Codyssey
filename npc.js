@@ -1,5 +1,5 @@
 export class Npc extends Phaser.Physics.Arcade.Sprite {
-    constructor(game, x, y, tag, name, scale) {
+    constructor(game, x, y, tag, name, scale, position_id) {
         super(game, 0, 0, tag);
         game.add.existing(this);
         game.physics.add.existing(this);
@@ -11,6 +11,7 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         // this.setMapPos(x,y);
         this.tag=tag;
         this.name=name;
+        this.position_id=position_id;
         
         let actualPosx=this.mapPosx*bgscale;
         let actualPosy=this.mapPosy*bgscale;
