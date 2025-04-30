@@ -21,6 +21,7 @@ class MainScene extends Phaser.Scene {
         this.player_direction=-1;
         this.zoomFactor=1.8; //1.8
         this.locationId=0;
+        this.player_id=1; //need change after login
     }
 
     init(data) {

@@ -9,12 +9,24 @@ export const getInventories = async (req, res) => {
   }
 };
 
-export const addInventory = async (req, res) => {
+// export const addInventory = async (req, res) => {
+//   try {
+//     const newInventory = new Inventory(req.body); // Create a new inventory record
+//     const savedInventory = await newInventory.save(); // Save to database
+//     res.status(201).json(savedInventory); // Respond with the saved record
+//   } catch (error) {
+//     res.status(400).json({ message: error.message }); // Handle errors
+//   }
+// };
+
+export const updateOrAddInventory = async (player_id, item_id, incrementValue) => {
   try {
-    const newInventory = new Inventory(req.body); // Create a new inventory record
-    const savedInventory = await newInventory.save(); // Save to database
-    res.status(201).json(savedInventory); // Respond with the saved record
+    await Inventory.updateOne(
+      { player_id, item_id }, // Filter criteria
+      { $inc: { amount: incrementValue } }, // Increment operation
+      { upsert: true } // Insert a new record if no match is found
+    );
   } catch (error) {
-    res.status(400).json({ message: error.message }); // Handle errors
+    console.error("Error updating or adding inventory:", error);
   }
 };
