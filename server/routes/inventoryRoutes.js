@@ -9,6 +9,6 @@ inventoryRouter.get("/", getInventories);
 // Route to add a new inventory
 inventoryRouter.post("/", updateOrAddInventory);
 
-inventoryRouter.post("/amount", getAmount);
+inventoryRouter.get("/amount", getAmount);
 
 export default inventoryRouter;

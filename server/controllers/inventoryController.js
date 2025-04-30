@@ -34,7 +34,7 @@ export const updateOrAddInventory = async (req, res) => {
 
 export const getAmount = async (req, res) => {
   try {
-    const { player_id, item_id } = req.query;
+    const { player_id, item_id } = req.body;
 
     // Convert inputs to numbers to avoid CastError
     const playerId = Number(player_id);
