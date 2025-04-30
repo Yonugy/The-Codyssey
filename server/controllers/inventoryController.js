@@ -40,14 +40,14 @@ export const updateOrAddInventory = async (req, res) => {
     const itemId = Number(item_id);
     const incrementValue = Number(amount);
 
-    console.log(player_id, item_id, amount);
-
     // Perform the update or add operation
     await Inventory.updateOne(
       { player_id: playerId, item_id: itemId }, // Filter criteria
       { $inc: { amount: incrementValue } }, // Increment operation
       { upsert: true } // Insert a new record if no match is found
     );
+
+    res.status(200).json({ message: "Inventory updated or added successfully" });
 
   } catch (error) {
     console.error("Error updating or adding inventory:", error);
