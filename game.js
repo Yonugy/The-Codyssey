@@ -20,6 +20,7 @@ class MainScene extends Phaser.Scene {
         this.movementSpeed=200;
         this.player_direction=-1;
         this.zoomFactor=1.8; //1.8
+        this.locationId=0;
     }
 
     init(data) {
@@ -29,13 +30,23 @@ class MainScene extends Phaser.Scene {
         this.sceneName = data.sceneName; //town (default scene)
         this.dialogue = data.dialogue || {};
         this.quest = data.quest || {};
-        this.alldoor = data.door || {};
         this.location = data.location || {};
-        this.allnpc = data.npc || {};
+        this.inventory = data.inventory || [];
+        this.player = data.player || {};
+        this.item = data.item || {};
+        this.action = data.action || {};
+        this.packageDetail = data.packageDetail || {};
+        this.position = data.position || {};
+        this.subquest = data.subquest || {};
+        this.package = data.package || {};
+        this.choice = data.choice || {};
+        this.playerProgress = data.playerProgress || {};
+        this.admin = data.admin || {};
+        this.npcDetail = data.npcDetail || {};
+        this.locationDetail = data.locationDetail || {};
     }
 
     preload() {
-        this.cameras.main.setBackgroundColor('#E98B45');
         this.load.image("Dungeon_Tileset", "asset/map_asset/Dungeon_Tileset.png");
         this.load.image("Big_Set", "asset/map_asset/Big_Set.png");
         this.load.image("Rustic_Indoor", "asset/map_asset/Rustic_Indoor.png");
@@ -55,7 +66,19 @@ class MainScene extends Phaser.Scene {
         this.load.image("house1_interior", "asset/house1_interior.png");
         this.load.image("ownhouse_interior", "asset/ownhouse_interior.jpg");
 
-        for (let [tag,npc] of Object.entries(this.allnpc)){
+        // for (let [tag,npc] of Object.entries(this.allnpc)){
+        //     if (npc.type === "image") {
+        //         this.load.image(tag, `asset/${npc.img}`);
+        //     }else if (npc.type === "spritesheet"){
+        //         console.log(tag);
+        //         this.load.spritesheet(tag, `asset/${npc.img}`, {
+        //             frameWidth: npc.frameSize.width,
+        //             frameHeight: npc.frameSize.height
+        //         });
+        //     }
+        // }
+
+        for (let [tag,npc] of Object.entries(this.npcDetail)){
             if (npc.type === "image") {
                 this.load.image(tag, `asset/${npc.img}`);
             }else if (npc.type === "spritesheet"){
@@ -72,16 +95,24 @@ class MainScene extends Phaser.Scene {
         //set initial quest and subquest in the beginning
         //use registry to store data across all scenes
         // let activeQuest = this.quest.init; //comment this before committing
-        let activeQuest = "quest2"; //uncomment this before committing
-        let activeSubQuest = this.quest[activeQuest].startquest;
+        // let activeQuest = "quest2"; //uncomment this before committing
+        let activeQuest = 1;
+        // let activeSubQuest = this.quest[activeQuest].startquest;
+        let activeSubQuest = 1;
         this.registry.set("activeQuest", activeQuest);
         this.registry.set("activeSubQuest", activeSubQuest);
         this.registry.set("inventory", this.inventory);
         this.registry.set("fulfill", this.fulfill);
 
         //import background
-        this.backdrop['town_map'] = new Backdrop(this, 0, 0, 'town_bg', this.zoomFactor);
-        this.current_bg=this.backdrop['town_map'];
+        let locationDetail = this.locationDetail[this.locationId];
+        this.cameras.main.setBackgroundColor(locationDetail.bgcolor);
+        this.zoomFactor=locationDetail.scale;
+        this.backdrop['map'] = new Backdrop(this, 0, 0, locationDetail.img, this.zoomFactor);
+        this.current_bg=this.backdrop['map'];
+
+        //background obstacle
+        this.backdrop['obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', this.zoomFactor);
 
         //import npc
         this.spawnNpc();
@@ -119,18 +150,24 @@ class MainScene extends Phaser.Scene {
         });
 
         //house collision area (door)
-        let doorData = this.alldoor[this.sceneName] //list of door of the current scene
-        for (let door of doorData){ //dictionary contains info of a door
-            if (door.to){ //not an exit (exit dont have "to")
-                let indoorDetail = this.location[door.to]; //target location detail
-                let label = indoorDetail.label; //location label for action text
-                let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
-                this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0); //create a door object
-            }
+        let locationDoors = this.location.filter(location => location.location_id !== this.locationId);
+        console.log(locationDoors);
+        for (let location of locationDoors){ //dictionary contains info of a door
+            let location_id = location.location_id
+            let label = this.locationDetail[location_id].label
+            let entrance = location.entrance_position;
+            this.doors[location_id] = new Door(this, entrance.x1, entrance.y1, entrance.x2, entrance.y2, '#000', label, location_id, 0); //create a door object
         }
 
-        //background obstacle
-        this.backdrop['town_obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', this.zoomFactor);
+        // let doorData = this.alldoor[this.sceneName] //list of door of the current scene
+        // for (let door of doorData){ //dictionary contains info of a door
+        //     if (door.to){ //not an exit (exit dont have "to")
+        //         let indoorDetail = this.location[door.to]; //target location detail
+        //         let label = indoorDetail.label; //location label for action text
+        //         let doorPos = door.position; //all 4 positions (x1,y1,x2,y2) of doors
+        //         this.doors[door.to] = new Door(this, doorPos.x1, doorPos.y1, doorPos.x2, doorPos.y2, '#000', label, door.to, 0); //create a door object
+        //     }
+        // }
 
         //Talk to npc button
         this.talkButton = this.add.text(this.gameWidth/2+50, this.gameHeight/2-50, 'Talk to someone', {
@@ -165,8 +202,9 @@ class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.doorList, this.showEnter, null, this);
 
         //Initial position of the player
-        let playerStartPosX = 140*this.zoomFactor;
-        let playerStartPosY = 260*this.zoomFactor;
+        let spawnPos = this.location.find(location => location.location_id === this.locationId).spawn_position;
+        let playerStartPosX = spawnPos.x * this.zoomFactor;
+        let playerStartPosY = spawnPos.y * this.zoomFactor;
         this.player.setPosition(playerStartPosX,playerStartPosY);
 
         //detect back to mainscene from indoor scene
@@ -180,7 +218,6 @@ class MainScene extends Phaser.Scene {
             }
         });
 
-        let zoomFactor = this.zoomFactor
         // this.cameras.main.setZoom(zoomFactor);
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
@@ -247,46 +284,41 @@ class MainScene extends Phaser.Scene {
         if (!this.physics.overlap(this.player, this.doorList)) {
             this.enterButton.setVisible(false);
         }
-
-        // let cam = this.cameras.main;
-        // console.log(cam.scrollX, cam.scrollY);
     }
 
     spawnNpc(){
         //import npc
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
-        let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
-        let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
-        for (let [tag,npc] of Object.entries(this.allnpc)){ //loop through all npc
-            if (questNpcData[tag] || locationNpcData[tag]){
-                if (questNpcData[tag] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){ //if npc in quest data
-                    var npcPos = questNpcData[tag].position; //position of the npc
-                }else if (locationNpcData[tag]){ //if npc in location data
-                    var npcPos = locationNpcData[tag].position; //position of the npc
-                    console.log(locationNpcData[tag]);
-                }else{
-                    continue; //skip if not in quest or location data
-                }
-                this.npc[tag] = new Npc(this, npcPos.x, npcPos.y, tag, npc.name, npc.scale);
-                console.log(tag,this.npc[tag].mapPosx, this.npc[tag].mapPosy);
-                if (npc.animation){
-                    for (let [key,anim] of Object.entries(npc.animation)){
-                        if (!this.anims.exists(key)){
-                            this.anims.create({
-                                key: key,
-                                frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
-                                frameRate: anim.frameRate, // Adjust speed (frames per second)
-                                repeat: anim.repeat // -1 = Loop infinitely
-                            });
-                        }
+        // let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
+        // let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
+
+        let posData = this.position.filter(position => position.location_id === this.locationId && (position.subquest_id === activeSubQuest || position.subquest_id === null));
+        console.log(posData);
+
+        for (let pos of posData){ //loop through all npc
+            let coordinate = pos.coordinates;
+            let tag = pos.npc;
+            console.log(tag);
+            let npcData = this.npcDetail[tag];
+            console.log(npcData);
+            this.npc[tag] = new Npc(this, coordinate.x, coordinate.y, tag, npcData.name, npcData.scale, pos.position_id);
+            if (npcData.animation){
+                for (let [key,anim] of Object.entries(npcData.animation)){
+                    if (!this.anims.exists(key)){
+                        this.anims.create({
+                            key: key,
+                            frames: this.anims.generateFrameNumbers(tag, { start: anim.startFrame, end: anim.endFrame }),
+                            frameRate: anim.frameRate, // Adjust speed (frames per second)
+                            repeat: anim.repeat // -1 = Loop infinitely
+                        });
                     }
-                    this.npc[tag].setFrame(npc.initialFrame);
                 }
+                this.npc[tag].setFrame(npc.initialFrame);
             }
         }
         this.children.bringToTop(this.player);
-        this.children.bringToTop(this.backdrop['town_obstacle']);
+        this.children.bringToTop(this.backdrop['obstacle']);
     }
 
     talk() {
@@ -295,9 +327,22 @@ class MainScene extends Phaser.Scene {
         let object = this.touching['npc'];
         console.log(`Talking to the ${object.name}...`);
         let activeSubQuest = this.registry.get("activeSubQuest");
-        let chats=this.dialogue[object.tag][activeSubQuest];
+        // let chats=this.dialogue[object.tag][activeSubQuest];
+        let chats = this.dialogue.filter(dialogue => dialogue.position_id === object.position_id);
+        console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
+        fetch("https://codyssey-mongodb.vercel.app/inventory", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              player_id: 1,
+              item_id: 1,
+              amount: 1
+            })
+          })
     }
 
     enterDoor() {
@@ -342,13 +387,22 @@ class MainScene extends Phaser.Scene {
             let activeQuest = this.registry.get("activeQuest");
             let activeSubQuest = this.registry.get("activeSubQuest");
             this.children.bringToTop(this.talkButton);
-            if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
+            let current_chat = this.dialogue.filter(dialogue => dialogue.position_id === object.position_id);
+            if (current_chat.length>0){
                 this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
                 this.talkButton.setText(`Talk to ${object.name}`);
                 this.talkButton.setVisible(true);
             }else{
                 this.talkButton.setVisible(false);
             }
+            
+            // if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
+            //     this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
+            //     this.talkButton.setText(`Talk to ${object.name}`);
+            //     this.talkButton.setVisible(true);
+            // }else{
+            //     this.talkButton.setVisible(false);
+            // }
         }
     }
 
@@ -376,8 +430,8 @@ class Game {
         console.log(window.innerWidth,window.innerHeight);
         this.gameWidth = window.innerWidth;
         this.gameHeight = window.innerHeight;
-        this.fetchMongo(); // Fetch data from MongoDB
-        this.fetchData().then(() => {
+        this.fetchData(); // Fetch data from MongoDB
+        this.fetchMongo().then(() => {
             this.startGame(); // Start game only after fetching data
         });
     }
@@ -421,27 +475,30 @@ class Game {
     fetchMongo = async () => {
         try {
             const urls = [
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/dialogue",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/quest",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/location",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/inventory",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/item",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/action",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/package_detail",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/position",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/subquest",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/package",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/choice",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/player_progress",
-                "https://codyssey-mongodb-bavpki7u2-yong-wais-projects.vercel.app/admin"
+                "https://codyssey-mongodb.vercel.app/dialogue",
+                "https://codyssey-mongodb.vercel.app/quest",
+                "https://codyssey-mongodb.vercel.app/location",
+                "https://codyssey-mongodb.vercel.app/inventory",
+                "https://codyssey-mongodb.vercel.app/player",
+                "https://codyssey-mongodb.vercel.app/item",
+                "https://codyssey-mongodb.vercel.app/action",
+                "https://codyssey-mongodb.vercel.app/package_detail",
+                "https://codyssey-mongodb.vercel.app/position",
+                "https://codyssey-mongodb.vercel.app/subquest",
+                "https://codyssey-mongodb.vercel.app/package",
+                "https://codyssey-mongodb.vercel.app/choice",
+                "https://codyssey-mongodb.vercel.app/player_progress",
+                "https://codyssey-mongodb.vercel.app/admin",
+                './game-data/npc_detail.json',
+                './game-data/location_detail.json'
             ];
 
             const responses = await Promise.all(urls.map(url => fetch(url)));
             const [
                 dialogue, quest, location,
                 inventory, player, item, action, packageDetail,
-                position, subquest, packageData, choice, playerProgress, admin
+                position, subquest, packageData, choice, playerProgress, admin,
+                npcDetail, locationDetail
             ] = await Promise.all(responses.map(res => res.json()));
 
             this.dialogue = dialogue;
@@ -458,11 +515,12 @@ class Game {
             this.choice = choice;
             this.playerProgress = playerProgress;
             this.admin = admin;
+            this.npcDetail = npcDetail;
+            this.locationDetail = locationDetail;
 
             console.log("Fetched dialogue:", dialogue);
             console.log("Fetched quest:", quest);
             console.log("Fetched location:", location);
-            console.log("Fetched npc:", npc);
             console.log("Fetched inventory:", inventory);
             console.log("Fetched player:", player);
             console.log("Fetched item:", item);
@@ -474,6 +532,8 @@ class Game {
             console.log("Fetched choice:", choice);
             console.log("Fetched playerProgress:", playerProgress);
             console.log("Fetched admin:", admin);
+            console.log("Fetched npcDetail:", npcDetail);
+            console.log("Fetched locationDetail:", locationDetail);
         } catch (error) {
             console.error('Error fetching data from MongoDB:', error);
         }
@@ -502,14 +562,25 @@ class Game {
             sceneName: sceneName,
             dialogue: this.dialogue,
             quest: this.quest,
-            door: this.door,
             location: this.location,
-            npc: this.npc,
+            inventory: this.inventory,
+            player: this.player,
+            item: this.item,
+            action: this.action,
+            packageDetail: this.packageDetail,
+            position: this.position,
+            subquest: this.subquest,
+            package: this.package,
+            choice: this.choice,
+            playerProgress: this.playerProgress,
+            admin: this.admin,
+            npcDetail: this.npcDetail,
+            locationDetail: this.locationDetail
         });
     }
 }
 
 
 // Create the game object with dynamic width & height
-const myGame = new Game(1450, 650);
+const myGame = new Game(1450, 650); //size wont be use
 

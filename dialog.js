@@ -7,8 +7,7 @@ export class Dialog{
         this.dialogContainer = this.game.add.container(30, game.gameHeight - 150).setScrollFactor(0).setDepth(1000); // High depth to ensure it's on top
     }
 
-    updateDialog(question, choices){
-        console.log(question);
+    updateDialog(dialogue_id){
         this.fulfill=this.game.registry.get("fulfill");
         this.inventory=this.game.registry.get("inventory");
         this.optionBoxes=[]
@@ -62,6 +61,8 @@ export class Dialog{
         //     wordWrap: { width: dialogWidth - 60 }
         // });
 
+        let question = game.dialogue.find(dialogue => dialogue.dialogue_id === dialogue_id);
+        console.log(question);
         this.questionBox = game.add.text(60, game.gameHeight - 130, question, {
             font: '24px Arial',
             fill: '#ffffff',
@@ -70,10 +71,12 @@ export class Dialog{
         this.questionBox.setScrollFactor(0);
         // this.dialogContainer.add(this.questionBox);
 
-        if (choices.choice){
+        let choices = game.choice.filter(choice => choice.dialogue_id === dialogue_id);
+        if (choices){
             let i=0;
             //choice: option text; value: respond text
-            for (let [choice, value] of Object.entries(choices.choice)){
+            for (let option of choices){
+                let choice = option.text;
                 let optionX = 60 + cam.scrollX;
                 let optionY = game.gameHeight - (90-35*i) + cam.scrollY;
                 this.option = game.add.text(optionX, optionY, `Option ${i+1}: ${choice}`, {
@@ -88,25 +91,32 @@ export class Dialog{
                 this.option.on('pointerdown', () => {
                     this.destroyDialog();
 
-                    if (value.item){
+                    if (option.package_id){
+                        let package_detail = game.packageDetail.filter(packageDetail => packageDetail.package_id === option.package_id);
                         console.log(this.inventory);
-                        if (value.mode=="take"){
-                            this.inventory.push(value.item);
-                            this.game.registry.set("inventory", this.inventory);
-                            this.updateDialog(value.respond,'');
-                        }else if (value.mode=="give"){
-                            if (this.inventory.includes(value.item)){
-                                this.inventory = this.inventory.filter(item => item !== value.item); //delete all Shit
-                                this.fulfill.push(value.fulfill);
-                                this.game.registry.set("fulfill", this.fulfill);
-                                this.checkCriteria();
-                                this.updateDialog(value.yrespond,'');
-                            }else{
-                                this.updateDialog(value.nrespond,'');
-                            }
-                        }else{
-                            console.log("Invalid mode")
+
+                        for (let item of package_detail){
+                            
                         }
+                        
+                        
+                        // if (value.mode=="take"){
+                        //     this.inventory.push(value.item);
+                        //     this.game.registry.set("inventory", this.inventory);
+                        //     this.updateDialog(value.respond,'');
+                        // }else if (value.mode=="give"){
+                        //     if (this.inventory.includes(value.item)){
+                        //         this.inventory = this.inventory.filter(item => item !== value.item); //delete all Shit
+                        //         this.fulfill.push(value.fulfill);
+                        //         this.game.registry.set("fulfill", this.fulfill);
+                        //         this.checkCriteria();
+                        //         this.updateDialog(value.yrespond,'');
+                        //     }else{
+                        //         this.updateDialog(value.nrespond,'');
+                        //     }
+                        // }else{
+                        //     console.log("Invalid mode")
+                        // }
                     }else{
                         this.updateDialog(value.respond,'');
                     }
@@ -141,6 +151,15 @@ export class Dialog{
         // this.uiCamera.add(this.dialogContainer);
     }
 
+    updateInventory(package_id){
+        let package_detail = game.packageDetail.filter(packageDetail => packageDetail.package_id === package_id);
+        console.log(this.inventory);
+
+        for (let item of package_detail){
+            
+        }
+    }
+
     checkCriteria(){
         let activeQuest = this.game.registry.get("activeQuest");
         let activeSubQuest = this.game.registry.get("activeSubQuest");
@@ -170,8 +189,10 @@ export class Dialog{
 
     showDialogs(){
         this.count=0;
-        let question=this.captions[this.count];
-        this.updateDialog(question, this.content[question]);
+        let current_dialogue = this.content[this.count];
+        // let question=this.captions[this.count];
+        // this.updateDialog(question, this.content[question]);
+        this.updateDialog(current_dialogue.dialogue_id);
     }
 
     // destroyDialog() {

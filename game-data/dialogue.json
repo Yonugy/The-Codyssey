@@ -1,0 +1,37 @@
+[
+    {
+        "dialogue_id": 1,
+        "position_id": 1,
+        "package_id": null,
+        "action_id": null,
+        "text": "You are a young code apprentice in the magical land of Codyssey, a land powered by ancient principles known as Object-Oriented Principles."
+    },
+    {
+        "dialogue_id": 2,
+        "position_id": 1,
+        "package_id": null,
+        "action_id": null,
+        "text": "A mysterious dark glitch has corrupted these principles, causing instability in the structure of our land."
+    },
+    {
+        "dialogue_id": 3,
+        "position_id": 1,
+        "package_id": null,
+        "action_id": null,
+        "text": "To restore balance, you must embark on a sacred journey across the Realms of Knowledge, mastering the lost principles and gathering the Legendary Crystal — Karstal."
+    },
+    {
+        "dialogue_id": 4,
+        "position_id": 1,
+        "package_id": null,
+        "action_id": null,
+        "text": "I entrust you with the critical mission. Only by reclaiming the six realm badges and the Karstal can you heal Codyssey and awaken its true strength once more."
+    },
+    {
+        "dialogue_id": 5,
+        "position_id": 1,
+        "package_id": 1,
+        "action_id": null,
+        "text": "The path ahead begins at the House of Blueprint... Step forward, apprentice. Destiny awaits."
+    }
+]

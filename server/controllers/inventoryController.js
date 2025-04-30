@@ -8,3 +8,13 @@ export const getInventories = async (req, res) => {
     res.json({ message: error.message });
   }
 };
+
+export const addInventory = async (req, res) => {
+  try {
+    const newInventory = new Inventory(req.body); // Create a new inventory record
+    const savedInventory = await newInventory.save(); // Save to database
+    res.status(201).json(savedInventory); // Respond with the saved record
+  } catch (error) {
+    res.status(400).json({ message: error.message }); // Handle errors
+  }
+};

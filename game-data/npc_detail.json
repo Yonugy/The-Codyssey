@@ -1,0 +1,8 @@
+{
+    "grand_compiler":{
+        "name": "Grand Compiler",
+        "type": "image",
+        "img": "trash_bin.png",
+        "scale": 0.05
+    }
+}
