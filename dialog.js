@@ -150,6 +150,7 @@ export class Dialog{
                     this.updateDialog(current_dialogue.dialogue_id);
                 }else{
                     game.collisionHappened=false;
+                    this.game.spawnNpc();
                 }
             });
         }
@@ -179,8 +180,9 @@ export class Dialog{
             let itemDetail = this.game.item.find(itemDetail => itemDetail.item_id === item.item_id);
             console.log(itemDetail);
             if (itemDetail.type === "milestone"){
-                console.log(itemDetail.subquest_id);
-                this.game.registry.set("activeSubQuest", itemDetail.subquest_id);
+                let nextSubQuest = this.game.package.find(packages => packages.package_id === package_id).subquest_id;
+                console.log(nextSubQuest);
+                this.game.registry.set("activeSubQuest", nextSubQuest);
                 console.log(this.game.registry.get("activeSubQuest"));
                 return true;
             }
@@ -199,32 +201,32 @@ export class Dialog{
         return true;
     }
 
-    checkCriteria(){
-        let activeQuest = this.game.registry.get("activeQuest");
-        let activeSubQuest = this.game.registry.get("activeSubQuest");
-        let criteria = this.game.quest[activeQuest].subquest[activeSubQuest].criteria;
-        console.log(criteria);
-        console.log(this.fulfill);
-        // update next quest to change activeQuest and/or activeSubQuest
-        if (criteria.every(item => this.fulfill.includes(item))) { //done subquest
-            let nextsubquest = this.game.quest[activeQuest].subquest[activeSubQuest].nextsubquest;
-            console.log(nextsubquest);
-            if (nextsubquest){
-                // this.game.activeSubQuest=nextsubquest;
-                this.game.registry.set("activeSubQuest", nextsubquest);
-            }else{
-                // this.game.activeQuest = this.game.quest[activeQuest].nextquest;
-                // this.game.activeSubQuest = this.game.quest[this.game.activeQuest].startquest;
-                this.game.registry.set("activeQuest", this.game.quest[activeQuest].nextquest);
-                activeQuest = this.game.registry.get("activeQuest");
-                this.game.registry.set("activeSubQuest", this.game.quest[activeQuest].startquest);
-            }
-            // console.log(this.game.activeQuest);
-            // console.log(this.game.activeSubQuest);
-            console.log(this.game.registry.get("activeQuest"));
-            console.log(this.game.registry.get("activeSubQuest"));
-        }
-}
+    // checkCriteria(){
+    //     let activeQuest = this.game.registry.get("activeQuest");
+    //     let activeSubQuest = this.game.registry.get("activeSubQuest");
+    //     let criteria = this.game.quest[activeQuest].subquest[activeSubQuest].criteria;
+    //     console.log(criteria);
+    //     console.log(this.fulfill);
+    //     // update next quest to change activeQuest and/or activeSubQuest
+    //     if (criteria.every(item => this.fulfill.includes(item))) { //done subquest
+    //         let nextsubquest = this.game.quest[activeQuest].subquest[activeSubQuest].nextsubquest;
+    //         console.log(nextsubquest);
+    //         if (nextsubquest){
+    //             // this.game.activeSubQuest=nextsubquest;
+    //             this.game.registry.set("activeSubQuest", nextsubquest);
+    //         }else{
+    //             // this.game.activeQuest = this.game.quest[activeQuest].nextquest;
+    //             // this.game.activeSubQuest = this.game.quest[this.game.activeQuest].startquest;
+    //             this.game.registry.set("activeQuest", this.game.quest[activeQuest].nextquest);
+    //             activeQuest = this.game.registry.get("activeQuest");
+    //             this.game.registry.set("activeSubQuest", this.game.quest[activeQuest].startquest);
+    //         }
+    //         // console.log(this.game.activeQuest);
+    //         // console.log(this.game.activeSubQuest);
+    //         console.log(this.game.registry.get("activeQuest"));
+    //         console.log(this.game.registry.get("activeSubQuest"));
+    //     }
+// }
 
     showDialogs(){
         this.count=0;

@@ -288,13 +288,19 @@ class MainScene extends Phaser.Scene {
     }
 
     spawnNpc(){
+        for (let npc of Object.values(this.npc)){
+            npc.destroy();
+        }
+        this.npc={};
+        this.npcList = [];
+
         //import npc
         let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
         // let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
         // let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
 
-        let posData = this.position.filter(position => position.location_id === this.locationId && position.subquest_id === activeSubQuest);
+        let posData = this.position.filter(position => position.location_id === this.locationId && (position.subquest_id === activeSubQuest || position.subquest_id === null));
         console.log(posData);
 
         for (let pos of posData){ //loop through all npc
@@ -327,8 +333,6 @@ class MainScene extends Phaser.Scene {
         this.collisionHappened = true;
         let object = this.touching['npc'];
         console.log(`Talking to the ${object.name}...`);
-        let activeSubQuest = this.registry.get("activeSubQuest");
-        // let chats=this.dialogue[object.tag][activeSubQuest];
         let chats = this.dialogue.filter(dialogue => dialogue.position_id === object.position_id);
         console.log(chats);
         this.dialog1 = new Dialog(this,chats);
@@ -387,8 +391,6 @@ class MainScene extends Phaser.Scene {
             this.touching['npc']=object;
             let activeSubQuest = this.registry.get("activeSubQuest");
             this.children.bringToTop(this.talkButton);
-            
-            // let current_chat = this.dialogue.filter(dialogue => dialogue.position_id === object.position_id);
             let positionDetail = this.position.find(position => position.npc === object.tag && position.location_id === this.locationId && (position.subquest_id === activeSubQuest || position.subquest_id === null));
             if (positionDetail) {
                 object.position_id = positionDetail.position_id;
@@ -401,15 +403,6 @@ class MainScene extends Phaser.Scene {
                     this.talkButton.setVisible(false);
                 }
             }
-            
-            
-            // if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
-            //     this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
-            //     this.talkButton.setText(`Talk to ${object.name}`);
-            //     this.talkButton.setVisible(true);
-            // }else{
-            //     this.talkButton.setVisible(false);
-            // }
         }
     }
 
