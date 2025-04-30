@@ -333,17 +333,18 @@ class MainScene extends Phaser.Scene {
         console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
-        // fetch("https://codyssey-mongodb.vercel.app/inventory", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //       player_id: 1,
-        //       item_id: 1,
-        //       amount: 1
-        //     })
-        //   })
+        fetch("https://codyssey-mongodb.vercel.app/inventory", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              player_id: 1,
+              item_id: 1,
+              amount: 1
+            })
+          })
+        
     }
 
     enterDoor() {
