@@ -93,7 +93,11 @@ export class Dialog{
                     this.destroyDialog();
 
                     if (option.package_id){
-                        this.updateInventory(option.package_id);
+                        let available = this.updateInventory(option.package_id);
+                        if (!available){
+                            this.updateDialog(option.alt_text);
+                            return;
+                        }
                         
                         
                         // if (value.mode=="take"){
@@ -155,30 +159,44 @@ export class Dialog{
     async updateInventory(package_id){
         let package_detail = this.game.packageDetail.filter(packageDetail => packageDetail.package_id === package_id);
 
-        for (let item of package_detail) {
-            let response = await fetch(`https://codyssey-mongodb.vercel.app/inventory/amount?player_id=${this.game.player_id}&item_id=${item.item_id}`, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            let data = await response.json();
-            console.log(data);
+        for (let item of package_detail) { //check if item enough for negative amount (giving item)
+            if (item.amount<0){
+                let response = await fetch(`https://codyssey-mongodb.vercel.app/inventory/amount?player_id=${this.game.player_id}&item_id=${item.item_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                });
+                let amount = await response.json();
+                console.log(amount);
+                if (amount<item.amount){
+                    return false;
+                }
+            }
         }
 
-        for (let item of package_detail) {
-          fetch("https://codyssey-mongodb.vercel.app/inventory", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              player_id: this.game.player_id,
-              item_id: item.item_id,
-              amount: item.amount,
-            }),
-          });
+        for (let item of package_detail) { //update inventory
+            let itemDetail = this.game.item.find(itemDetail => itemDetail.item_id === item.item_id);
+            console.log(itemDetail);
+            if (itemDetail.type === "milestone"){
+                console.log(itemDetail.subquest_id);
+                this.game.registry.set("activeSubQuest", itemDetail.subquest_id);
+                console.log(this.game.registry.get("activeSubQuest"));
+                return true;
+            }
+            fetch("https://codyssey-mongodb.vercel.app/inventory", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                player_id: this.game.player_id,
+                item_id: item.item_id,
+                amount: item.amount,
+                }),
+            });
         }
+        return true;
     }
 
     checkCriteria(){

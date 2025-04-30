@@ -294,7 +294,7 @@ class MainScene extends Phaser.Scene {
         // let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
         // let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
 
-        let posData = this.position.filter(position => position.location_id === this.locationId && (position.subquest_id === activeSubQuest || position.subquest_id === null));
+        let posData = this.position.filter(position => position.location_id === this.locationId && position.subquest_id === activeSubQuest);
         console.log(posData);
 
         for (let pos of posData){ //loop through all npc
@@ -303,7 +303,7 @@ class MainScene extends Phaser.Scene {
             console.log(tag);
             let npcData = this.npcDetail[tag];
             console.log(npcData);
-            this.npc[tag] = new Npc(this, coordinate.x, coordinate.y, tag, npcData.name, npcData.scale, pos.position_id);
+            this.npc[tag] = new Npc(this, coordinate.x, coordinate.y, tag, npcData.name, npcData.scale);
             if (npcData.animation){
                 for (let [key,anim] of Object.entries(npcData.animation)){
                     if (!this.anims.exists(key)){
@@ -385,17 +385,23 @@ class MainScene extends Phaser.Scene {
     showTalk(player, object) {
         if (!this.collisionHappened) {
             this.touching['npc']=object;
-            let activeQuest = this.registry.get("activeQuest");
             let activeSubQuest = this.registry.get("activeSubQuest");
             this.children.bringToTop(this.talkButton);
-            let current_chat = this.dialogue.filter(dialogue => dialogue.position_id === object.position_id);
-            if (current_chat.length>0){
-                this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
-                this.talkButton.setText(`Talk to ${object.name}`);
-                this.talkButton.setVisible(true);
-            }else{
-                this.talkButton.setVisible(false);
+            
+            // let current_chat = this.dialogue.filter(dialogue => dialogue.position_id === object.position_id);
+            let positionDetail = this.position.find(position => position.npc === object.tag && position.location_id === this.locationId && (position.subquest_id === activeSubQuest || position.subquest_id === null));
+            if (positionDetail) {
+                object.position_id = positionDetail.position_id;
+                let current_chat = this.dialogue.filter(dialogue => dialogue.position_id === positionDetail.position_id);
+                if (current_chat.length>0){
+                    this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
+                    this.talkButton.setText(`Talk to ${object.name}`);
+                    this.talkButton.setVisible(true);
+                }else{
+                    this.talkButton.setVisible(false);
+                }
             }
+            
             
             // if (this.dialogue[object.tag][activeSubQuest] && this.quest[activeQuest].subquest[activeSubQuest].location == this.sceneName){
             //     this.talkButton.setPosition(object.x - this.talkButton.width / 2,object.y - object.displayHeight/2 - this.talkButton.height - 5)
