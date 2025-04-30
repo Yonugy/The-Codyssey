@@ -63,7 +63,7 @@ export class Dialog{
 
         let question = game.dialogue.find(dialogue => dialogue.dialogue_id === dialogue_id);
         console.log(question);
-        this.questionBox = game.add.text(60, game.gameHeight - 130, question, {
+        this.questionBox = game.add.text(60, game.gameHeight - 130, question.text, {
             font: '24px Arial',
             fill: '#ffffff',
             wordWrap: { width: game.gameWidth - 120 }
@@ -72,7 +72,8 @@ export class Dialog{
         // this.dialogContainer.add(this.questionBox);
 
         let choices = game.choice.filter(choice => choice.dialogue_id === dialogue_id);
-        if (choices){
+        if (choices.length>0){
+            console.log(choices);
             let i=0;
             //choice: option text; value: respond text
             for (let option of choices){
@@ -120,24 +121,29 @@ export class Dialog{
                 i++;
             }
         }else{
-            if (choices.animation){
-                let npc = this.game.touching.npc;
-                this.game.npc[npc.tag].play(choices.animation);
-            }
+            // if (choices.animation){
+            //     let npc = this.game.touching.npc;
+            //     this.game.npc[npc.tag].play(choices.animation);
+            // }
             this.graphics.setInteractive(new Phaser.Geom.Rectangle(dialogX, dialogY, dialogWidth, dialogHeight), Phaser.Geom.Rectangle.Contains);
 
             this.graphics.on('pointerdown', () => {
-                if (choices.fulfill){
-                    this.fulfill.push(choices.fulfill);
-                    this.game.registry.set("fulfill", this.fulfill);
-                    console.log(this.game.registry.get("fulfill"));
-                    this.checkCriteria();
+                if (this.content[this.count].package_id){
+                    this.updateInventory(this.content[this.count].package_id);
                 }
+                // if (choices.fulfill){
+                //     this.fulfill.push(choices.fulfill);
+                //     this.game.registry.set("fulfill", this.fulfill);
+                //     console.log(this.game.registry.get("fulfill"));
+                //     this.checkCriteria();
+                // }
                 this.destroyDialog();
                 this.count++;
-                if (this.count<this.captions.length){
-                    let question=this.captions[this.count];
-                    this.updateDialog(question, this.content[question]);
+                if (this.count<this.content.length){
+                    // let question=this.captions[this.count];
+                    // this.updateDialog(question, this.content[question]);
+                    let current_dialogue = this.content[this.count];
+                    this.updateDialog(current_dialogue.dialogue_id);
                 }else{
                     game.collisionHappened=false;
                 }
@@ -146,9 +152,19 @@ export class Dialog{
         // this.uiCamera.add(this.dialogContainer);
     }
 
-    updateInventory(package_id){
-        let package_detail = game.packageDetail.filter(packageDetail => packageDetail.package_id === package_id);
-        console.log(this.inventory);
+    async updateInventory(package_id){
+        let package_detail = this.game.packageDetail.filter(packageDetail => packageDetail.package_id === package_id);
+
+        for (let item of package_detail) {
+            let response = await fetch(`https://codyssey-mongodb.vercel.app/inventory/amount?player_id=${this.game.player_id}&item_id=${item.item_id}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+            let data = await response.json();
+            console.log(data);
+        }
 
         for (let item of package_detail) {
           fetch("https://codyssey-mongodb.vercel.app/inventory", {
