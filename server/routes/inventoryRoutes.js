@@ -1,5 +1,5 @@
 import express from "express";
-import { getInventories, addInventory } from "../controllers/inventoryController.js";
+import { getInventories, updateOrAddInventory } from "../controllers/inventoryController.js";
 
 const inventoryRouter = express.Router();
 
@@ -7,6 +7,6 @@ const inventoryRouter = express.Router();
 inventoryRouter.get("/", getInventories);
 
 // Route to add a new inventory
-inventoryRouter.post("/", addInventory);
+inventoryRouter.post("/", updateOrAddInventory);
 
 export default inventoryRouter;

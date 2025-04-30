@@ -92,12 +92,7 @@ export class Dialog{
                     this.destroyDialog();
 
                     if (option.package_id){
-                        let package_detail = game.packageDetail.filter(packageDetail => packageDetail.package_id === option.package_id);
-                        console.log(this.inventory);
-
-                        for (let item of package_detail){
-                            
-                        }
+                        this.updateInventory(option.package_id);
                         
                         
                         // if (value.mode=="take"){
@@ -155,8 +150,18 @@ export class Dialog{
         let package_detail = game.packageDetail.filter(packageDetail => packageDetail.package_id === package_id);
         console.log(this.inventory);
 
-        for (let item of package_detail){
-            
+        for (let item of package_detail) {
+          fetch("https://codyssey-mongodb.vercel.app/inventory", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              player_id: this.game.player_id,
+              item_id: item.item_id,
+              amount: item.amount,
+            }),
+          });
         }
     }
 
