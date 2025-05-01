@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 const PlayerProgressSchema = new mongoose.Schema({
-  questId: { type: mongoose.Schema.Types.ObjectId, ref: "Quest", required: true },
-  progress: { type: String, required: true },
+  player_id: { type: Number, required: true },
+  subquest_id: { type: Number, required: true },
+  status: { type: String },
 }, {
   collection: "player_progress", // Explicitly set the collection name
 });
