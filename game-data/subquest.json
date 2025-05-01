@@ -1,8 +1,230 @@
 [
-    {
-        "subquest_id": 1,
-        "quest_id": 1,
-        "admin_id": 1,
-        "title": "Welcome"
-    }
+  {
+    "subquest_id": 1,
+    "quest_id": 1,
+    "admin_id": 1,
+    "title": "Find Sir Ben's Blueprint Scroll"
+  },
+  {
+    "subquest_id": 2,
+    "quest_id": 1,
+    "admin_id": 1,
+    "title": "Karbot Stole the Scroll (House B)"
+  },
+  {
+    "subquest_id": 3,
+    "quest_id": 1,
+    "admin_id": 1,
+    "title": "Retrieve Scroll from Karbot (House B)"
+  },
+  {
+    "subquest_id": 4,
+    "quest_id": 1,
+    "admin_id": 1,
+    "title": "Return Scroll & Get \"Class Forge\" Badge"
+  },
+  {
+    "subquest_id": 5,
+    "quest_id": 1,
+    "admin_id": 1,
+    "title": "Study Karbot with Ava (House B)"
+  },
+  {
+    "subquest_id": 6,
+    "quest_id": 2,
+    "admin_id": 1,
+    "title": "Power Up Karbot for the Scroll"
+  },
+  {
+    "subquest_id": 7,
+    "quest_id": 2,
+    "admin_id": 1,
+    "title": "Get Power Crystal from House C"
+  },
+  {
+    "subquest_id": 8,
+    "quest_id": 2,
+    "admin_id": 1,
+    "title": "Return Crystal, Get Scroll from Karbot"
+  },
+  {
+    "subquest_id": 9,
+    "quest_id": 2,
+    "admin_id": 1,
+    "title": "Return Blueprint Scroll to Sir Ben"
+  },
+  {
+    "subquest_id": 10,
+    "quest_id": 2,
+    "admin_id": 1,
+    "title": "Observe Karbot's Tasks with Ava"
+  },
+  {
+    "subquest_id": 11,
+    "quest_id": 2,
+    "admin_id": 1,
+    "title": "Report Observations & Earn Object Badge"
+  },
+  {
+    "subquest_id": 12,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Get Access Code from Axion (Locked Chamber)"
+  },
+  {
+    "subquest_id": 13,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Talk to Cipher for Access Code"
+  },
+  {
+    "subquest_id": 14,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Solve Cipher's Riddle for Access Code"
+  },
+  {
+    "subquest_id": 15,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Use Code to Unlock Chamber with Axion"
+  },
+  {
+    "subquest_id": 16,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Retrieve Power Crystal for Karbot (House B)"
+  },
+  {
+    "subquest_id": 17,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Complete All Subquests in House A & B"
+  },
+  {
+    "subquest_id": 18,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Final Chat with Cipher (Encapsulation Explained)"
+  },
+  {
+    "subquest_id": 19,
+    "quest_id": 3,
+    "admin_id": 1,
+    "title": "Understand Encapsulation & Earn Badge"
+  },
+  {
+    "subquest_id": 20,
+    "quest_id": 4,
+    "admin_id": 1,
+    "title": "Talk to Alex about Grandpa's System"
+  },
+  {
+    "subquest_id": 21,
+    "quest_id": 4,
+    "admin_id": 1,
+    "title": "Retrieve Remote from Auntie Ang (House E)"
+  },
+  {
+    "subquest_id": 22,
+    "quest_id": 4,
+    "admin_id": 1,
+    "title": "Get Remote & Hear Auntie Ang's Story (House E)"
+  },
+  {
+    "subquest_id": 23,
+    "quest_id": 4,
+    "admin_id": 1,
+    "title": "Return to Alex & Grandpa Explains Remote"
+  },
+  {
+    "subquest_id": 24,
+    "quest_id": 4,
+    "admin_id": 1,
+    "title": "Grandpa Explains Abstraction Concept"
+  },
+  {
+    "subquest_id": 25,
+    "quest_id": 4,
+    "admin_id": 1,
+    "title": "Earn the Abstract Badge"
+  },
+  {
+    "subquest_id": 26,
+    "quest_id": 5,
+    "admin_id": 1,
+    "title": "Talk to Auntie Ang about Her Robots"
+  },
+  {
+    "subquest_id": 27,
+    "quest_id": 5,
+    "admin_id": 1,
+    "title": "Auntie Ang Explains Robot Differences"
+  },
+  {
+    "subquest_id": 28,
+    "quest_id": 5,
+    "admin_id": 1,
+    "title": "Get Poly Logbook from Sir Ben (House A)"
+  },
+  {
+    "subquest_id": 29,
+    "quest_id": 5,
+    "admin_id": 1,
+    "title": "Return Logbook to Auntie Ang & Discuss Polymorphism"
+  },
+  {
+    "subquest_id": 30,
+    "quest_id": 5,
+    "admin_id": 1,
+    "title": "Earn the Polymorphism Badge"
+  },
+  {
+    "subquest_id": 31,
+    "quest_id": 6,
+    "admin_id": 1,
+    "title": "Talk to Uncle Chong & Observe Wai and Lina"
+  },
+  {
+    "subquest_id": 32,
+    "quest_id": 6,
+    "admin_id": 1,
+    "title": "Uncle Chong Explains Shared & Unique Traits"
+  },
+  {
+    "subquest_id": 33,
+    "quest_id": 6,
+    "admin_id": 1,
+    "title": "Learn About Wai & Lina's Personalities"
+  },
+  {
+    "subquest_id": 34,
+    "quest_id": 6,
+    "admin_id": 1,
+    "title": "Reflect with Uncle Chong & Get Inheritance Badge"
+  },
+  {
+    "subquest_id": 35,
+    "quest_id": 7,
+    "admin_id": 1,
+    "title": "Return to the Grand Compiler (Central)"
+  },
+  {
+    "subquest_id": 36,
+    "quest_id": 7,
+    "admin_id": 1,
+    "title": "Present Badges & Legendary Crystal"
+  },
+  {
+    "subquest_id": 37,
+    "quest_id": 7,
+    "admin_id": 1,
+    "title": "Answer OOP Concept Questions"
+  },
+  {
+    "subquest_id": 38,
+    "quest_id": 7,
+    "admin_id": 1,
+    "title": "Become the Codebound Master"
+  }
 ]
