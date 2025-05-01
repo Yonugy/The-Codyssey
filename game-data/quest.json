@@ -1,6 +1,26 @@
 [
-    {
-        "quest_id": 1,
-        "title": "Story Premise"
-    }
+  {
+    "quest_id": 1,
+    "title": "Learn how classes define the structure and rules of entities."
+  },
+  {
+    "quest_id": 2,
+    "title": "Understand that objects are real-world uses of classes."
+  },
+  {
+    "quest_id": 3,
+    "title": "Discover how information is protected and accessed only through proper channels."
+  },
+  {
+    "quest_id": 4,
+    "title": "Understand how complexity is hidden through simplified interfaces"
+  },
+  {
+    "quest_id": 5,
+    "title": "Discover how objects, despite being created from the same class or interface, can behave differently when they perform the same action."
+  },
+  {
+    "quest_id": 6,
+    "title": "Explore how child classes inherit traits from parent classes"
+  }
 ]
