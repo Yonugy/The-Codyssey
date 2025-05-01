@@ -111,6 +111,17 @@ export class Dialog{
             let itemDetail = this.game.item.find(itemDetail => itemDetail.item_id === item.item_id);
             console.log(itemDetail);
             if (itemDetail.type === "milestone"){
+                fetch("https://codyssey-mongodb.vercel.app/player_progress", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                    player_id: this.game.player_id,
+                    subquest_id: this.game.registry.get("activeSubQuest"),
+                    status: "Complete",
+                    }),
+                });
                 let nextSubQuest = this.game.package.find(packages => packages.package_id === package_id).subquest_id;
                 console.log(nextSubQuest);
                 this.game.registry.set("activeSubQuest", nextSubQuest);
