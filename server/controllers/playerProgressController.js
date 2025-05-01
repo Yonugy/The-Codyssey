@@ -18,3 +18,24 @@ export const addPlayerProgress = async (req, res) => {
     res.status(400).json({ message: error.message }); // Handle errors
   }
 };
+
+export const updatePlayerProgressStatus = async (req, res) => {
+  try {
+    const { player_id, subquest_id, status } = req.body;
+
+    // Find the record by player_id and subquest_id and update the status
+    const updatedProgress = await PlayerProgress.findOneAndUpdate(
+      { player_id, subquest_id }, // Find the record by player_id and subquest_id
+      { status }, // Update the status field
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProgress) {
+      return res.status(404).json({ message: "Player progress not found" }); // Handle record not found
+    }
+
+    res.status(200).json(updatedProgress); // Respond with the updated record
+  } catch (error) {
+    res.status(400).json({ message: error.message }); // Handle errors
+  }
+};
