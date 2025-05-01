@@ -67,17 +67,9 @@ class MainScene extends Phaser.Scene {
         this.load.image("house1_interior", "asset/house1_interior.png");
         this.load.image("ownhouse_interior", "asset/ownhouse_interior.jpg");
 
-        // for (let [tag,npc] of Object.entries(this.allnpc)){
-        //     if (npc.type === "image") {
-        //         this.load.image(tag, `asset/${npc.img}`);
-        //     }else if (npc.type === "spritesheet"){
-        //         console.log(tag);
-        //         this.load.spritesheet(tag, `asset/${npc.img}`, {
-        //             frameWidth: npc.frameSize.width,
-        //             frameHeight: npc.frameSize.height
-        //         });
-        //     }
-        // }
+        this.load.image('inventory_icon', 'asset/inventory_icon.png'); // Replace with the actual path to your image
+        this.load.image('close_icon', 'asset/close_icon.webp');
+        this.load.image('menu_icon', 'asset/menu_icon.png');
 
         for (let [tag,npc] of Object.entries(this.npcDetail)){
             if (npc.type === "image") {
@@ -199,6 +191,30 @@ class MainScene extends Phaser.Scene {
         });
         this.enterButton.setVisible(false);
 
+        // Create a menu button on the top-right corner
+        this.inventoryButton = this.add.image(this.gameWidth - 50, 50, 'inventory_icon') // Replace 'menuIcon' with your image key
+            .setScale(0.2) // Scale the image if needed
+            .setInteractive() // Make the image clickable
+            .on('pointerdown', () => {
+                this.openInventory(); // Call the menu function when clicked
+            });
+        this.inventoryButton.setScrollFactor(0);
+
+        // Ensure the button stays on top
+        this.children.bringToTop(this.inventoryButton);
+
+        //Menu button
+        this.menuButton = this.add.image(this.gameWidth - 50, 150, 'menu_icon') // Replace 'menuIcon' with your image key
+            .setScale(0.4) // Scale the image if needed
+            .setInteractive() // Make the image clickable
+            .on('pointerdown', () => {
+                this.openMenu(); // Call the menu function when clicked
+            });
+        this.menuButton.setScrollFactor(0);
+
+        // Ensure the button stays on top
+        this.children.bringToTop(this.menuButton);
+
         //Collision listener
         this.npcList = Object.values(this.npc);
         this.physics.add.overlap(this.player, this.npcList, this.showTalk, null, this);
@@ -292,6 +308,7 @@ class MainScene extends Phaser.Scene {
 
     spawnNpc(){
         for (let npc of Object.values(this.npc)){
+            npc.anims.stop();
             npc.destroy();
         }
         this.npc={};
@@ -324,11 +341,13 @@ class MainScene extends Phaser.Scene {
                         });
                     }
                 }
-                this.npc[tag].setFrame(npc.initialFrame);
+                this.npc[tag].setFrame(npcData.initialFrame);
+                this.npc[tag].play("idle");
             }
         }
         this.children.bringToTop(this.player);
         this.children.bringToTop(this.backdrop['obstacle']);
+        console.log(this.npc);
     }
 
     talk() {
@@ -438,6 +457,138 @@ class MainScene extends Phaser.Scene {
             this.enterButton.setText(`Enter ${objectName}`);
             this.enterButton.setVisible(true);
         }
+    }
+
+    openInventory(){
+        this.inventoryButton.setVisible(false);
+
+        // Create a semi-transparent background
+        this.inventoryBg = this.add.graphics();
+        this.inventoryBg.fillStyle(0x000000, 0.8); // Black with 80% opacity
+        this.inventoryBg.fillRect(50, 50, this.gameWidth - 100, this.gameHeight - 100); // Adjust size and position
+        this.inventoryBg.setScrollFactor(0);
+
+        // Add a title
+        this.inventoryTitle = this.add.text(this.gameWidth / 2, 70, 'Inventory', {
+            fontSize: '32px',
+            fill: '#ffffff'
+        }).setOrigin(0.5);
+        this.inventoryTitle.setScrollFactor(0);
+
+        // Display inventory items
+        this.inventoryItems = [];
+        let startX = 100;
+        let startY = 120;
+        let itemWidth = 100;
+        let itemHeight = 100;
+        let itemsPerRow = Math.floor((this.gameWidth - 200) / itemWidth);
+
+        this.inventory.forEach((item, index) => {
+            let x = startX + (index % itemsPerRow) * itemWidth;
+            let y = startY + Math.floor(index / itemsPerRow) * itemHeight;
+
+            // Add item background
+            let itemBg = this.add.graphics();
+            itemBg.fillStyle(0xffffff, 1); // White background
+            itemBg.fillRect(x, y, itemWidth - 10, itemHeight - 10);
+            this.inventoryItems.push(itemBg);
+
+            // Add item text or image
+            let itemText = this.add.text(x + 10, y + 10, item.name, {
+                fontSize: '16px',
+                fill: '#000000'
+            });
+            this.inventoryItems.push(itemText);
+        });
+
+        // Add a close button
+        this.closeButton = this.add.image(this.gameWidth - 70, 70, 'close_icon') // Replace 'close_icon' with your image key
+        .setScale(0.1) // Scale the image if needed
+        .setInteractive() // Make the image clickable
+        .on('pointerdown', () => {
+            this.closeInventory(); // Close the inventory UI
+        });
+        this.closeButton.setScrollFactor(0);
+    }
+
+    closeInventory() {
+        // Destroy all inventory UI elements
+        this.inventoryBg.destroy();
+        this.inventoryTitle.destroy();
+        this.closeButton.destroy();
+        this.inventoryItems.forEach(item => item.destroy());
+        this.inventoryItems = [];
+        this.inventoryButton.setVisible(true);
+    }
+
+    openMenu() {
+        // Pause the game
+        // this.scene.pause();
+        this.collisionHappened = true;
+    
+        // Create a semi-transparent background
+        this.menuBg = this.add.graphics();
+        this.menuBg.fillStyle(0x000000, 0.8); // Black with 80% opacity
+        this.menuBg.fillRect(50, 50, this.gameWidth - 100, this.gameHeight - 100); // Adjust size and position
+        this.menuBg.setScrollFactor(0);
+    
+        // Add "Game Paused" text
+        this.menuTitle = this.add.text(this.gameWidth / 2, 100, 'Game Paused', {
+            fontSize: '48px',
+            fill: '#ffffff'
+        }).setOrigin(0.5);
+        this.menuTitle.setScrollFactor(0);
+    
+        // Add Resume button
+        this.resumeButton = this.add.text(this.gameWidth / 2, this.gameHeight / 2 - 50, 'Resume', {
+            fontSize: '32px',
+            fill: '#ffffff',
+            backgroundColor: '#000000',
+            padding: { x: 10, y: 5 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
+            this.closeMenu(); // Resume the game
+        });
+        this.resumeButton.setScrollFactor(0);
+    
+        // Add Save & Exit button
+        this.saveExitButton = this.add.text(this.gameWidth / 2, this.gameHeight / 2 + 50, 'Save & Exit', {
+            fontSize: '32px',
+            fill: '#ffffff',
+            backgroundColor: '#000000',
+            padding: { x: 10, y: 5 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
+            this.saveAndExit(); // Save the game and exit
+        });
+        this.saveExitButton.setScrollFactor(0);
+    }
+
+    closeMenu() {
+        // Resume the game
+        // this.scene.resume();
+        this.collisionHappened = false;
+    
+        // Destroy menu UI elements
+        this.menuBg.destroy();
+        this.menuTitle.destroy();
+        this.resumeButton.destroy();
+        this.saveExitButton.destroy();
+    }
+
+    saveAndExit() {
+        console.log('Game saved! Exiting...');
+        // Add your save logic here (e.g., send data to a server or save locally)
+    
+        // Stop the current scene and go back to the main menu or quit
+        this.scene.stop('MainScene');
+        this.scene.stop('IndoorScene');
+        // Optionally, redirect to a main menu scene if you have one
+        // this.scene.start('MainMenu');
     }
 }
 

@@ -1,8 +1,249 @@
 {
     "grand_compiler":{
         "name": "Grand Compiler",
-        "type": "image",
-        "img": "trash_bin.png",
-        "scale": 0.05
+        "type": "spritesheet",
+        "img": "grandCompiler_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "auntie_ang":{
+        "name": "Auntie Ang",
+        "type": "spritesheet",
+        "img": "ang_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "uncle_chong":{
+        "name": "Uncle Chong",
+        "type": "spritesheet",
+        "img": "chong_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "ava":{
+        "name": "Ava",
+        "type": "spritesheet",
+        "img": "ava_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "gatekeeper_axion":{
+        "name": "Gatekeeper Axion",
+        "type": "spritesheet",
+        "img": "axion_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "grandpa":{
+        "name": "Grandpa",
+        "type": "spritesheet",
+        "img": "grandpa_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "wai":{
+        "name": "Wai",
+        "type": "spritesheet",
+        "img": "wai_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "sir_ben":{
+        "name": "Sir Ben",
+        "type": "spritesheet",
+        "img": "ben_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "karbot_A":{
+        "name": "Karbot",
+        "type": "spritesheet",
+        "img": "karbotAng1_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "karbot_B":{
+        "name": "Karbot",
+        "type": "spritesheet",
+        "img": "karbotAng2_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "karbot":{
+        "name": "Karbot",
+        "type": "spritesheet",
+        "img": "karbot_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "cipher":{
+        "name": "Cipher",
+        "type": "spritesheet",
+        "img": "cipher_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
+    },
+    "lina":{
+        "name": "Lina",
+        "type": "spritesheet",
+        "img": "lina_spritesheet.png",
+        "scale": 0.05,
+        "frameSize": {
+            "width": 640,
+            "height": 640
+        },
+        "animation": {
+            "idle":{
+                "startFrame":0,
+                "endFrame": 4,
+                "frameRate": 10,
+                "repeat": -1
+            }
+        },
+        "initialFrame": 0
     }
 }
