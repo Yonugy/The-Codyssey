@@ -315,10 +315,7 @@ class MainScene extends Phaser.Scene {
         this.npcList = [];
 
         //import npc
-        let activeQuest = this.registry.get("activeQuest");
         let activeSubQuest = this.registry.get("activeSubQuest");
-        // let questNpcData = this.quest[activeQuest].subquest[activeSubQuest].npc || {}; //list of quest data
-        // let locationNpcData = this.location[this.sceneName].npc || {}; //list of location data
 
         let posData = this.position.filter(position => position.location_id === this.locationId && (position.subquest_id === activeSubQuest || position.subquest_id === null));
         console.log(posData);
@@ -347,6 +344,8 @@ class MainScene extends Phaser.Scene {
         }
         this.children.bringToTop(this.player);
         this.children.bringToTop(this.backdrop['obstacle']);
+        this.children.bringToTop(this.inventoryButton);
+        this.children.bringToTop(this.menuButton);
         console.log(this.npc);
     }
 
@@ -359,53 +358,15 @@ class MainScene extends Phaser.Scene {
         console.log(chats);
         this.dialog1 = new Dialog(this,chats);
         this.dialog1.showDialogs();
-        // fetch("https://codyssey-mongodb.vercel.app/inventory", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //       player_id: 1,
-        //       item_id: 1,
-        //       amount: 1
-        //     })
-        //   })
     }
 
     enterDoor() {
         this.enterButton.setVisible(false);
         let objectName = this.touching['door'].label;
-        // let activeQuest = this.registry.get("activeQuest");
-        // let activeSubQuest = this.registry.get("activeSubQuest");
         console.log(`Entering ${objectName}...`);
-
-        //remove all npcs in the current scene
-        // let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
-        // if (questDetail.location != this.sceneName){
-        //     for (let npc of Object.values(this.npc)){
-        //         npc.destroy();
-        //     }
-        //     this.npc={};
-        //     this.npcList = [];
-        // }
-
-        //save current map position
-        this.MapPosx = this.current_bg.getMapPos().x;
-        this.MapPosy = this.current_bg.getMapPos().y;
-        console.log(this.MapPosx);
-        console.log(this.MapPosy);
 
         //switch to indoor scene without pausing or shutdown MainScene
         this.scene.switch('IndoorScene', {
-            // width: this.gameWidth,
-            // height: this.gameHeight,
-            // dialogue: this.dialogue,
-            // quest: this.quest,
-            // npc: this.allnpc,
-            // location: this.location,
-            // doorData: this.alldoor,
-            // sceneName: this.touching['door'].target,
-
             width: this.gameWidth,
             height: this.gameHeight,
             locationId: this.touching['door'].target,
