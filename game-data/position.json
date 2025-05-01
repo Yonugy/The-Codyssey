@@ -1,22 +1,122 @@
 [
-    {
-        "position_id": 1,
-        "location_id": 0,
-        "subquest_id": null,
-        "npc": "grand_compiler",
-        "coordinates": {
-            "x": 672,
-            "y": 100
-        }
-    },
-    {
-        "position_id": 1,
-        "location_id": 0,
-        "subquest_id": 1,
-        "npc": "grand_compiler",
-        "coordinates": {
-            "x": 672,
-            "y": 100
-        }
+  {
+    "position_id": 1,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "grand_compiler",
+    "coordinates": {
+      "x": 672,
+      "y": 100
     }
+  },
+  {
+    "position_id": 2,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Sir Ben",
+    "coordinates": {
+      "x": 685,
+      "y": 115
+    }
+  },
+  {
+    "position_id": 3,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Karbot",
+    "coordinates": {
+      "x": 650,
+      "y": 90
+    }
+  },
+  {
+    "position_id": 4,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Ava",
+    "coordinates": {
+      "x": 698,
+      "y": 80
+    }
+  },
+  {
+    "position_id": 5,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Gatekeeper Axion",
+    "coordinates": {
+      "x": 660,
+      "y": 125
+    }
+  },
+  {
+    "position_id": 6,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Grandpa",
+    "coordinates": {
+      "x": 678,
+      "y": 105
+    }
+  },
+  {
+    "position_id": 7,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Auntie Ang",
+    "coordinates": {
+      "x": 645,
+      "y": 110
+    }
+  },
+  {
+    "position_id": 8,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Karbot A",
+    "coordinates": {
+      "x": 705,
+      "y": 95
+    }
+  },
+  {
+    "position_id": 9,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Karbot B",
+    "coordinates": {
+      "x": 665,
+      "y": 85
+    }
+  },
+  {
+    "position_id": 10,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Uncle Chong",
+    "coordinates": {
+      "x": 680,
+      "y": 120
+    }
+  },
+  {
+    "position_id": 11,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Wai",
+    "coordinates": {
+      "x": 655,
+      "y": 108
+    }
+  },
+  {
+    "position_id": 12,
+    "location_id": 0,
+    "subquest_id": 1,
+    "npc": "Lina",
+    "coordinates": {
+      "x": 690,
+      "y": 118
+    }
+  }
 ]
