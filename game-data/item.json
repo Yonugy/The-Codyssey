@@ -1,7 +1,6 @@
 [
     {
         "item_id": 1,
-        "subqueset_id": 1,
         "name": null,
         "type": "milestone",
         "description": null

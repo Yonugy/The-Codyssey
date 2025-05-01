@@ -93,7 +93,11 @@ export class Dialog{
                     this.destroyDialog();
 
                     if (option.package_id){
-                        this.updateInventory(option.package_id);
+                        let available = this.updateInventory(option.package_id);
+                        if (!available){
+                            this.updateDialog(option.alt_text);
+                            return;
+                        }
                         
                         
                         // if (value.mode=="take"){
@@ -146,6 +150,7 @@ export class Dialog{
                     this.updateDialog(current_dialogue.dialogue_id);
                 }else{
                     game.collisionHappened=false;
+                    this.game.spawnNpc();
                 }
             });
         }
@@ -155,58 +160,73 @@ export class Dialog{
     async updateInventory(package_id){
         let package_detail = this.game.packageDetail.filter(packageDetail => packageDetail.package_id === package_id);
 
-        for (let item of package_detail) {
-            let response = await fetch(`https://codyssey-mongodb.vercel.app/inventory/amount?player_id=${this.game.player_id}&item_id=${item.item_id}`, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            let data = await response.json();
-            console.log(data);
+        for (let item of package_detail) { //check if item enough for negative amount (giving item)
+            if (item.amount<0){
+                let response = await fetch(`https://codyssey-mongodb.vercel.app/inventory/amount?player_id=${this.game.player_id}&item_id=${item.item_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                });
+                let amount = await response.json();
+                console.log(amount);
+                if (amount<item.amount){
+                    return false;
+                }
+            }
         }
 
-        for (let item of package_detail) {
-          fetch("https://codyssey-mongodb.vercel.app/inventory", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              player_id: this.game.player_id,
-              item_id: item.item_id,
-              amount: item.amount,
-            }),
-          });
+        for (let item of package_detail) { //update inventory
+            let itemDetail = this.game.item.find(itemDetail => itemDetail.item_id === item.item_id);
+            console.log(itemDetail);
+            if (itemDetail.type === "milestone"){
+                let nextSubQuest = this.game.package.find(packages => packages.package_id === package_id).subquest_id;
+                console.log(nextSubQuest);
+                this.game.registry.set("activeSubQuest", nextSubQuest);
+                console.log(this.game.registry.get("activeSubQuest"));
+                return true;
+            }
+            fetch("https://codyssey-mongodb.vercel.app/inventory", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                player_id: this.game.player_id,
+                item_id: item.item_id,
+                amount: item.amount,
+                }),
+            });
         }
+        return true;
     }
 
-    checkCriteria(){
-        let activeQuest = this.game.registry.get("activeQuest");
-        let activeSubQuest = this.game.registry.get("activeSubQuest");
-        let criteria = this.game.quest[activeQuest].subquest[activeSubQuest].criteria;
-        console.log(criteria);
-        console.log(this.fulfill);
-        // update next quest to change activeQuest and/or activeSubQuest
-        if (criteria.every(item => this.fulfill.includes(item))) { //done subquest
-            let nextsubquest = this.game.quest[activeQuest].subquest[activeSubQuest].nextsubquest;
-            console.log(nextsubquest);
-            if (nextsubquest){
-                // this.game.activeSubQuest=nextsubquest;
-                this.game.registry.set("activeSubQuest", nextsubquest);
-            }else{
-                // this.game.activeQuest = this.game.quest[activeQuest].nextquest;
-                // this.game.activeSubQuest = this.game.quest[this.game.activeQuest].startquest;
-                this.game.registry.set("activeQuest", this.game.quest[activeQuest].nextquest);
-                activeQuest = this.game.registry.get("activeQuest");
-                this.game.registry.set("activeSubQuest", this.game.quest[activeQuest].startquest);
-            }
-            // console.log(this.game.activeQuest);
-            // console.log(this.game.activeSubQuest);
-            console.log(this.game.registry.get("activeQuest"));
-            console.log(this.game.registry.get("activeSubQuest"));
-        }
-}
+    // checkCriteria(){
+    //     let activeQuest = this.game.registry.get("activeQuest");
+    //     let activeSubQuest = this.game.registry.get("activeSubQuest");
+    //     let criteria = this.game.quest[activeQuest].subquest[activeSubQuest].criteria;
+    //     console.log(criteria);
+    //     console.log(this.fulfill);
+    //     // update next quest to change activeQuest and/or activeSubQuest
+    //     if (criteria.every(item => this.fulfill.includes(item))) { //done subquest
+    //         let nextsubquest = this.game.quest[activeQuest].subquest[activeSubQuest].nextsubquest;
+    //         console.log(nextsubquest);
+    //         if (nextsubquest){
+    //             // this.game.activeSubQuest=nextsubquest;
+    //             this.game.registry.set("activeSubQuest", nextsubquest);
+    //         }else{
+    //             // this.game.activeQuest = this.game.quest[activeQuest].nextquest;
+    //             // this.game.activeSubQuest = this.game.quest[this.game.activeQuest].startquest;
+    //             this.game.registry.set("activeQuest", this.game.quest[activeQuest].nextquest);
+    //             activeQuest = this.game.registry.get("activeQuest");
+    //             this.game.registry.set("activeSubQuest", this.game.quest[activeQuest].startquest);
+    //         }
+    //         // console.log(this.game.activeQuest);
+    //         // console.log(this.game.activeSubQuest);
+    //         console.log(this.game.registry.get("activeQuest"));
+    //         console.log(this.game.registry.get("activeSubQuest"));
+    //     }
+// }
 
     showDialogs(){
         this.count=0;

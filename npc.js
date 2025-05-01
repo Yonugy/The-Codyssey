@@ -1,5 +1,5 @@
 export class Npc extends Phaser.Physics.Arcade.Sprite {
-    constructor(game, x, y, tag, name, scale, position_id) {
+    constructor(game, x, y, tag, name, scale, position_id=0) {
         super(game, 0, 0, tag);
         game.add.existing(this);
         game.physics.add.existing(this);
