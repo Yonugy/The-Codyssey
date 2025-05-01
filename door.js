@@ -30,8 +30,8 @@ export class Door extends Phaser.Physics.Arcade.Sprite {
         let actualPosy=this.mapPosy*bgscale;
         this.setPosition(actualPosx,actualPosy);
         // this.setPosition(this.mapPosx,this.mapPosy);
-        console.log(this.x,this.y);
-        console.log(this.game.player.x,this.game.player.y);
+        // console.log(this.x,this.y);
+        // console.log(this.game.player.x,this.game.player.y);
     }
 
     setMapPos(x,y){

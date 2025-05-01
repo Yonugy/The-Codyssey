@@ -17,7 +17,7 @@ class MainScene extends Phaser.Scene {
         this.backdrop={};
         this.doors={};
         this.current_bg;
-        this.movementSpeed=200;
+        this.movementSpeed=200; //200
         this.player_direction=-1;
         this.zoomFactor=1.8; //1.8
         this.locationId=0;
@@ -60,9 +60,9 @@ class MainScene extends Phaser.Scene {
 
         this.load.image('town_bg', 'asset/town_map.jpg');
         this.load.image('town_obstacle', 'asset/town_map_obstacle.png');
-        this.load.spritesheet('fighter', 'asset/fighter_walk_idle.png', {
-            frameWidth: 128.25,  // Adjust based on your sprite sheet
-            frameHeight: 130
+        this.load.spritesheet('fighter', 'asset/mc_spritesheet.png', {
+            frameWidth: 641,  // Adjust based on your sprite sheet
+            frameHeight: 640.8
         });
         this.load.image("house1_interior", "asset/house1_interior.png");
         this.load.image("ownhouse_interior", "asset/ownhouse_interior.jpg");
@@ -122,30 +122,33 @@ class MainScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(this.gameWidth / 2, this.gameHeight / 2, 'fighter');
         // this.player.setScale(0.2);
 
+        //background obstacle
+        this.backdrop['obstacle'] = new Backdrop(this, 0, 0, 'town_obstacle', this.zoomFactor);
+
         this.anims.create({
             key: 'fighter_left',
-            frames: this.anims.generateFrameNumbers('fighter', { start: 0, end: 7 }),
-            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('fighter', { start: 8, end: 13 }),
+            frameRate: 20,
             repeat: -1
         });
 
         this.anims.create({
             key: 'fighter_right',
-            frames: this.anims.generateFrameNumbers('fighter', { start: 8, end: 15 }),
-            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('fighter', { start: 14, end: 19 }),
+            frameRate: 20,
             repeat: -1
         });
 
         this.anims.create({
             key: 'fighter_left_idle',
-            frames: this.anims.generateFrameNumbers('fighter', { start: 16, end: 21 }),
+            frames: this.anims.generateFrameNumbers('fighter', { start: 0, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'fighter_right_idle',
-            frames: this.anims.generateFrameNumbers('fighter', { start: 24, end: 29 }),
+            frames: this.anims.generateFrameNumbers('fighter', { start: 4, end: 7 }),
             frameRate: 10,
             repeat: -1
         });
@@ -224,7 +227,7 @@ class MainScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
         this.physics.world.setBounds(0, 0, this.current_bg.width*this.zoomFactor, this.current_bg.height*this.zoomFactor);
         this.player.setCollideWorldBounds(true); // Prevent the player from moving outside the bounds
-        // this.player.setScale(1/zoomFactor);
+        this.player.setScale(0.1);
         // this.movementSpeed = this.movementSpeed/zoomFactor;
     }
 
@@ -353,19 +356,19 @@ class MainScene extends Phaser.Scene {
     enterDoor() {
         this.enterButton.setVisible(false);
         let objectName = this.touching['door'].label;
-        let activeQuest = this.registry.get("activeQuest");
-        let activeSubQuest = this.registry.get("activeSubQuest");
+        // let activeQuest = this.registry.get("activeQuest");
+        // let activeSubQuest = this.registry.get("activeSubQuest");
         console.log(`Entering ${objectName}...`);
 
         //remove all npcs in the current scene
-        let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
-        if (questDetail.location != this.sceneName){
-            for (let npc of Object.values(this.npc)){
-                npc.destroy();
-            }
-            this.npc={};
-            this.npcList = [];
-        }
+        // let questDetail = this.quest[activeQuest].subquest[activeSubQuest]; //list of quest data
+        // if (questDetail.location != this.sceneName){
+        //     for (let npc of Object.values(this.npc)){
+        //         npc.destroy();
+        //     }
+        //     this.npc={};
+        //     this.npcList = [];
+        // }
 
         //save current map position
         this.MapPosx = this.current_bg.getMapPos().x;
@@ -375,14 +378,34 @@ class MainScene extends Phaser.Scene {
 
         //switch to indoor scene without pausing or shutdown MainScene
         this.scene.switch('IndoorScene', {
+            // width: this.gameWidth,
+            // height: this.gameHeight,
+            // dialogue: this.dialogue,
+            // quest: this.quest,
+            // npc: this.allnpc,
+            // location: this.location,
+            // doorData: this.alldoor,
+            // sceneName: this.touching['door'].target,
+
             width: this.gameWidth,
             height: this.gameHeight,
+            locationId: this.touching['door'].target,
             dialogue: this.dialogue,
             quest: this.quest,
-            npc: this.allnpc,
             location: this.location,
-            doorData: this.alldoor,
-            sceneName: this.touching['door'].target,
+            inventory: this.inventory,
+            player: this.player,
+            item: this.item,
+            action: this.action,
+            packageDetail: this.packageDetail,
+            position: this.position,
+            subquest: this.subquest,
+            package: this.package,
+            choice: this.choice,
+            playerProgress: this.playerProgress,
+            admin: this.admin,
+            npcDetail: this.npcDetail,
+            locationDetail: this.locationDetail,
         });
     }
 
