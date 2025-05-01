@@ -10,7 +10,7 @@
         "bgcolor": "#4F546B",
         "map": "map1",
         "name": "Mbat",
-        "tileset": "Big_Set"
+        "tileset": "Dungeon_Tileset"
     },
     "2":{
         "label": "Realm 1",
