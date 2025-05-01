@@ -203,28 +203,4 @@
     "admin_id": 1,
     "title": "Return to Uncle Chong to Reflect and Receive the Legendary Crystal and Inheritance Badge"
   },
-  {
-    "subquest_id": 35,
-    "quest_id": 7,
-    "admin_id": 1,
-    "title": "Return to the Grand Compiler at the Core of Codyssey (Central of the Map)"
-  },
-  {
-    "subquest_id": 36,
-    "quest_id": 7,
-    "admin_id": 1,
-    "title": "Present Your Six Realm Badges and the Legendary Crystal – Karstal"
-  },
-  {
-    "subquest_id": 37,
-    "quest_id": 7,
-    "admin_id": 1,
-    "title": "The Grand Compiler Tests Your Understanding with OOP Concept Questions"
-  },
-  {
-    "subquest_id": 38,
-    "quest_id": 7,
-    "admin_id": 1,
-    "title": "Upon Proving Your Mastery, the Grand Compiler Crowns You Codebound Master"
-  }
 ]
