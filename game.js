@@ -486,6 +486,7 @@ class MainScene extends Phaser.Scene {
         // Pause the game
         // this.scene.pause();
         this.collisionHappened = true;
+        this.menuButton.setVisible(false);
     
         // Create a semi-transparent background
         this.menuBg = this.add.graphics();
@@ -539,6 +540,7 @@ class MainScene extends Phaser.Scene {
         this.menuTitle.destroy();
         this.resumeButton.destroy();
         this.saveExitButton.destroy();
+        this.menuButton.setVisible(true);
     }
 
     saveAndExit() {
