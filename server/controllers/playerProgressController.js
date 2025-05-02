@@ -39,3 +39,12 @@ export const updatePlayerProgressStatus = async (req, res) => {
     res.status(400).json({ message: error.message }); // Handle errors
   }
 };
+
+export const deleteAllPlayerProgresses = async (req, res) => {
+  try {
+    const result = await PlayerProgress.deleteMany(); // Delete all records
+    res.status(200).json({ message: "All player progress records deleted successfully", result });
+  } catch (error) {
+    res.status(500).json({ message: error.message }); // Handle errors
+  }
+};
